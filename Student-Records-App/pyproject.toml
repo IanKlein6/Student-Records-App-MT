@@ -17,6 +17,7 @@ packages = [{include = "student_records_app", from = "src"}]
 
 [tool.poetry.group.dev.dependencies]
 uvicorn = "^0.34.3"
+pytest = "^8.4.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
