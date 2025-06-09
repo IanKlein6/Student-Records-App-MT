@@ -1,0 +1,23 @@
+[project]
+name = "student-records-app"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "IanKlein6",email = "ianklein66@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi (>=0.115.12,<0.116.0)"
+]
+
+[tool.poetry]
+packages = [{include = "student_records_app", from = "src"}]
+
+
+[tool.poetry.group.dev.dependencies]
+uvicorn = "^0.34.3"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
