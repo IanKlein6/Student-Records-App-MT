@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query, HTTPException, APIRouter 
 from tortoise.contrib.fastapi import register_tortoise
 from app.models.student import Student
-from typing import Optional 
+from typing import Optional, List 
 from tortoise.expressions import Q #allows for logic Querying 
-from fastapi import HTTPException
+
+
 
 app = FastAPI()
 
@@ -16,13 +17,23 @@ async def create_student(name: str, email: str):
 
 ##Retrieve students 
 @app.get("/student/")
-async def get_student(name: Optional[str] = None, email: Optional[str] = None):
+async def get_student(
+    name: Optional[list[str]] = Query(default=None), 
+    email: Optional[list[str]] = Query(default=None)
+):
     filters = Q() #empty filter to alow for building of multiple filters
-    if name:
-        filters &= Q(name=name)
+
+    if name: #allows for multiple, varying types of queries to be searched in the same batch. 
+        name_filter = Q(name__icontains=name[0]) #name__icontains == non-case sensitive 
+        for n in name[1:]:
+            name_filter |= Q(name__icontains=n)
+        filters |= name_filter # |= is OR logic
     if email:
-        filters &= Q(email=email)
-    
+        email_filter = Q(email__icontains=email[0])
+        for e in email[1:]:
+            email_filter |= Q(email__icontains=e)
+        filters |= email_filter 
+
     if name or email: #runs only if filter(s) were given 
         students = await Student.filter(filters).all()
         if not students:
