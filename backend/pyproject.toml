@@ -2,26 +2,28 @@
 name = "student-records-app"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "IanKlein6",email = "ianklein66@gmail.com"}
-]
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = [
-    "fastapi (>=0.115.12,<0.116.0)",
-    "tortoise-orm (>=0.25.1,<0.26.0)",
-    "asyncpg (>=0.30.0,<0.31.0)",
-    "aerich (>=0.9.0,<0.10.0)"
-]
+dependencies = ["fastapi (>=0.115.12,<0.116.0)", "tortoise-orm (>=0.25.1,<0.26.0)", "asyncpg (>=0.30.0,<0.31.0)", "aerich (>=0.9.0,<0.10.0)", "python-dotenv (>=1.1.0,<2.0.0)"]
 
-[tool.poetry]
-packages = [{include = "student_records_app", from = "src"}]
+[[project.authors]]
+name = "IanKlein6"
+email = "ianklein66@gmail.com"
 
+[[tool.poetry.packages]]
+include = "student_records_app"
+from = "src"
 
 [tool.poetry.group.dev.dependencies]
 uvicorn = "^0.34.3"
 pytest = "^8.4.0"
 httpx = "^0.28.1"
+tomlkit = "^0.13.3"
+
+[tool.aerich]
+tortoise_orm = "tortoise_config.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
