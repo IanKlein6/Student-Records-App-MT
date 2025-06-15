@@ -3,8 +3,14 @@ from tortoise.contrib.fastapi import register_tortoise
 from app.models.student import Student
 from typing import Optional, List 
 from tortoise.expressions import Q #allows for logic Querying 
+import logging 
+from app.utils.logger import create_logger, query_logger, delete_logger, error_logger
 
-
+logging.basicConfig(
+    level=logging.INFO, # change to DEBUG for debugging 
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -12,6 +18,7 @@ app = FastAPI()
 @app.post("/student/")
 async def create_student(name: str, email: str):
     student = await Student.create(name=name, email=email)
+    create_logger.info(f"Created student: {student.name} ({student.email})")
     return student
 
 
@@ -28,18 +35,29 @@ async def get_student(
         for n in name[1:]:
             name_filter |= Q(name__icontains=n)
         filters |= name_filter # |= is OR logic
+        query_logger.debug(f"Applying name filter(s): {name}")
+
     if email:
         email_filter = Q(email__icontains=email[0])
         for e in email[1:]:
             email_filter |= Q(email__icontains=e)
         filters |= email_filter 
+        query_logger.debug(f"Applying email filter(s): {email}")
 
     if name or email: #runs only if filter(s) were given 
+        query_logger.debug(f"Executing student search with combined filters: {filters}")
         students = await Student.filter(filters).all()
-        if not students:
-            raise HTTPException(status_code=404, detail="No matching students found")
-        return {"students": students} #returns specified student
 
+        if not students:
+            query_logger.info(f"No students found with filters: name={name}, email={email}")
+            raise HTTPException(status_code=404, detail="No matching students found")
+        
+        query_logger.info(f"Found {len(students)} student(s) with filters: name={name}, email={email}")
+        return {"students": students} #returns specified student
+    
+    # Fallback: no filters 
+    all_students = await Student.all()
+    query_logger.info(f"Retrieved all students: total {len(all_students)}")
     return {"All students": await Student.all()} #return all students
    
 
@@ -51,14 +69,18 @@ async def delete_student(name: str, email: Optional[str] = None): # end point de
     if email: #and email if provided 
         filters &=Q(email=email)
 
+    delete_logger.debug(f"Delete request filters: name={name}, email={email}")
+
     students_to_delete = await Student.filter(filters).all() #fetching records matching the filter extracting names for return message 
 
     if not students_to_delete: #error for if no students found
+        error_logger.warning(f"Delete failed: no student found with name={name}, email={email}")
         raise HTTPException(status_code=404, detail="Student not found")
     
     deleted_names = [student.name for student in students_to_delete] #extract students names into list for return message
-
     await Student.filter(filters).delete() #delete function of students. Await allow python to pause while waiting for slow Queries
+   
+    delete_logger.info(f"Deleted {len(deleted_names)} student(s): {deleted_names}")
 
     return { #return num of students and corresponding names for safety 
         "message": f"Deleted {len(deleted_names)} student(s).",
