@@ -1,0 +1,32 @@
+# Byte-compiled / compiled files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+.venv/
+env/
+
+# Tortoise ORM
+*.sqlite3
+*.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Test output
+htmlcov/
+coverage.xml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# dotenv
+.env
