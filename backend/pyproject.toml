@@ -19,6 +19,7 @@ uvicorn = "^0.34.3"
 pytest = "^8.4.0"
 httpx = "^0.28.1"
 tomlkit = "^0.13.3"
+pytest-asyncio = "^1.0.0"
 
 [tool.aerich]
 tortoise_orm = "tortoise_config.TORTOISE_ORM"

@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 
-for tortoise_config import TORTOISE_ORM #adjust path as needed
+from tortoise_config import TORTOISE_ORM #adjust path as needed
 
 app = FastAPI()
 
