@@ -17,7 +17,7 @@ Table groups {
   scheduled_date date
   semester_id int [ref: > semesters.id]
 }
-
+ 
 Table student_group_memberships {
   id int [pk, increment]
   student_id int [ref: > students.id]
