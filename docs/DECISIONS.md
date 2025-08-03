@@ -50,3 +50,20 @@ Reason: Backend model design and logic will lead the project. The frontend will 
 ## 2025-08-03 Diagrams Used for Orientation, Not Exhaustiveness
 Reason: Diagrams are for understanding and navigation — not full documentation. Unplanned diagrams will be created only when needed, allowing development to continue without over-planning.
 
+## 2025-08-03 Backend Role and Flow Clarified  
+Reason: Confirmed that FastAPI is the core backend and not just middleware. Requests flow: Frontend → FastAPI → Tortoise ORM → PostgreSQL.
+
+## 2025-08-03 Security Layers Sketched in Architecture  
+Reason: Security and validation will be handled at key points in the request lifecycle: between Frontend and FastAPI (via Firebase Auth and request validation) and between FastAPI and the database (via ORM-level schema enforcement).
+
+## 2025-08-03 `status` Replaces `active` on Student  
+Reason: A string-based `status` field allows for clearer state tracking (`"active"`, `"passed"`, `"failed"`) than a boolean flag.
+
+## 2025-08-03 Group–Student Link Moved to Separate Table  
+Reason: A separate `student_group_memberships` table better reflects the many-to-many relationship between students and groups and keeps `students` clean.
+
+## 2025-08-03 Attempts No Longer Store Group ID  
+Reason: Group affiliation is not needed at the `attempt` level since scheduling is handled through the `appointments` table. This reduces redundancy.
+
+## 2025-08-03 Appointments Link Students, Technika, and Slots  
+Reason: The `appointments` table serves as the source of truth for scheduling, tying together the student, technika, and time slot in one place.

@@ -66,7 +66,15 @@
 
 - Reconfirmed that email notifications, Firebase Auth, and deployment hardening will be implemented later — not blocked by postponing them
 
+- Create #1 "Mini Systems Overview" of the 5 core Excalidraw diagrams:
+    - mini systems overview detailing the basic overview from frontend - api - backend - DB and back. noted security checks to be added later
+- Started working on #2 "Entity Relationship Diagram" of the core drawings:
+    - Started remapping the first version of this. 
+    - Finished Student, Exam_attempt, Group adding FK/PK 
+        
+
 - Next:
-  - Draw and complete the five core Excalidraw diagrams
+  - Draw and complete the the rest of the 4 of 5 core Excalidraw diagrams
   - Start implementing backend models and migrations
   - Add API routes for Student, Group, Semester, Attempt
+  - Test routes
