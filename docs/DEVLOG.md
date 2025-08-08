@@ -12,7 +12,7 @@
     - Local testing status / next steps
 
 
-## 2025-08-01
+## 01-08-2025
 - Finalized core database schema with all necessary tables:
   - `students`, `groups`, `student_group_memberships`, `semesters`
   - `exam_attempt_evaluation` (previously called `trials`)
@@ -36,7 +36,7 @@
   - Begin implementing backend endpoints
 
 
-## 2025-08-03
+## 3-08-2025
 - Reviewed overall app complexity: concluded this is a mid-to-large solo project with realistic scope for 2–4 months of focused part-time development.
   - Not just a CRUD app — includes retry logic, scheduling, semester transitions, access control, and external integrations.
 
@@ -45,14 +45,14 @@
   - Security and email integration will be deferred until later, but key hooks will be structured into the models and routes now.
   - Testing will be continuous, with final audit before deployment.
 
-- Created two roadmap files:
+- Created two roadmap inside of roadmap.md:
   - A **Quick Overview** (high-level phase list)
   - A **Detailed Checklist** with tasks per phase and early security markers
 
 - Confirmed Linear issue structure:
   - Planning and implementation live in one Linear project
   - Use status flow + labels (e.g. `planning`, `excalidraw`, `backend`) instead of separate projects
-  - Diagram tickets will live in `Idea Dump` and be drawn as needed
+  - Tickets will live in `Idea Dump` and be drawn as needed
 
 - Decided to draw **five essential Excalidraw diagrams** before backend implementation:
   - Entity Relationship Diagram (ERD)
@@ -78,3 +78,16 @@
   - Start implementing backend models and migrations
   - Add API routes for Student, Group, Semester, Attempt
   - Test routes
+
+
+## 8-08-2025
+- added Work Student Potential option to student and exam attempt
+  - should be 3 tiered to show how strongly they want them needs to then be a visual and search or filter students by potential
+  - added issue to Linear "Student Profile" for frontend later and to backend student + exam attempt model 
+  - have to do some averaging math if multiple attempts have different potential scales.
+- created semester student flow chart explain how the student and its exams move through the app 
+- drew two excali drawings 
+  - 1 semester student flow: logic showing the logic of how a student progresses through the app
+  - 2 semester student flow: explained. more in depth explaining of what happens in the app in regard to the student and their attempts and interaction with the examiner and scheduling. 
+- started on Diagram Request/Response Flow for critical Action
+  - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense. 
