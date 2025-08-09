@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+
+## Basic API test 
+@app.get("/")
+async def read_root():
+    return {"message": "Hello World"}
+
 ##Create students 
 @app.post("/student/")
 async def create_student(name: str, email: str):
