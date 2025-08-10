@@ -8,7 +8,7 @@ class StudentStatus(str, Enum):
     FAILED = "failed"
     ARCHIVE = "archive"
 
-class WordPotential(str, Enum):
+class WorkPotential(str, Enum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -26,7 +26,7 @@ class Student(Model):
     status = fields.CharEnumField(StudentStatus, default=StudentStatus.ACTIVE)
     attempt_num = fields.IntField(default=0)
 
-    work_student_potential = fields.CharEnumField(WordPotential, null=True)
+    work_student_potential = fields.CharEnumField(WorkPotential, null=True)
     
     created_at = fields.DatetimeField(auto_now_add=True)
 
