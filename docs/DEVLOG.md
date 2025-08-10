@@ -91,3 +91,15 @@
   - 2 semester student flow: explained. more in depth explaining of what happens in the app in regard to the student and their attempts and interaction with the examiner and scheduling. 
 - started on Diagram Request/Response Flow for critical Action
   - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense. 
+
+## 09-08-2025
+- Added Linear issues for all main models: Student, Semester, Evaluation, Appointment, Examiner, User
+  - added sub tickets covering all important points for each model including schemas, testing, migrations and documentation. 
+- Worked on refining the Student model
+  - Identified that FrozenSets (sets that are immutable once created) do not work for this since they are not a Tortoise ORM field. 
+    - Instead had to use CharEnumField. Creates a class with constraint options which are then added to the models field.
+  - Created two Enum classes: StudentStatus and WorkPotential with their respective options. 
+  - added attempt field with int
+  - added created_at to see when the profile was created
+  - added meta indexes last_name and first_name for easy sorting
+  - single index on status for see who's active

@@ -67,3 +67,15 @@ Reason: Group affiliation is not needed at the `attempt` level since scheduling 
 
 ## 2025-08-03 Appointments Link Students, Technika, and Slots  
 Reason: The `appointments` table serves as the source of truth for scheduling, tying together the student, technika, and time slot in one place.
+
+## 09-08-25 Enum fields will use CharEnumField
+Reason: decided to use Enum because FrozenSets are not available in Tortoise. 
+
+## 09-08-25 Time Stamp created in Student
+Reason: time stamp helps see when the student was created/ when they started
+
+## 09-08-25 Indexs will be meta in models
+Reason: meta instead of inline because simpler coding and overview. 
+
+## 09-08-25 Composite indexes
+Reason: used when possible for indexes that are frequently searched
