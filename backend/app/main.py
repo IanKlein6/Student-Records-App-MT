@@ -2,6 +2,7 @@
 # app/main.py
 from typing import Optional, List
 import logging
+import os
 
 from fastapi import FastAPI, Query, HTTPException, Response, APIRouter 
 from tortoise.contrib.fastapi import register_tortoise
@@ -12,6 +13,9 @@ from tortoise.expressions import Q # allows for logic Querying
 from app.models.student import Student
 from app.utils.logger import create_logger, query_logger, delete_logger, error_logger
 
+
+#Testing potentially remove for production
+TESTING = os.getenv("TESTING") == "1" 
 
 logging.basicConfig(
     level=logging.INFO, # change to DEBUG for debugging 
@@ -54,7 +58,7 @@ async def create_student(payload: StudentCreate, response: Response):
         raise HTTPException(status_code=409, detail="Email already exists")
 
     response.headers["Location"] = f"/student/{student.id}"
-    
+
     create_logger.info(
         "student.create",
         extra={
@@ -137,10 +141,11 @@ async def delete_student(name: str, email: Optional[str] = None): # end point de
 
 
 ##Connection from Tortoise to FastAPI 
-register_tortoise( 
-    app, #app instance being connected. Core Object 
-    db_url="postgres://postgres:postgres@localhost:5432/student_records",
-    modules={"models": ["app.models.student"]},
-    generate_schemas=False,
-    add_exception_handlers=True,
-)
+if not TESTING:
+    register_tortoise( 
+        app, #app instance being connected. Core Object 
+        db_url="postgres://postgres:postgres@localhost:5432/student_records",
+        modules={"models": ["app.models.student"]},
+        generate_schemas=False,
+        add_exception_handlers=True,
+    )
