@@ -1,6 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 import os
 
 TORTOISE_ORM = {
@@ -9,7 +6,10 @@ TORTOISE_ORM = {
     },
     "apps": {
         "models": {
-            "models": ["app.models", "aerich.models"],  # DO NOT include student.py directly
+            "models": [
+                "app.models.student", 
+                "aerich.models", 
+            ], 
             "default_connection": "default",
         }
     }

@@ -1,10 +1,16 @@
+
+# app/main.py
+from typing import Optional, List
+import logging
+
 from fastapi import FastAPI, Query, HTTPException, APIRouter 
 from tortoise.contrib.fastapi import register_tortoise
+from tortoise.contrib.pydantic import pydantic_model_creator
+from tortoise.expressions import Q # allows for logic Querying
+
 from app.models.student import Student
-from typing import Optional, List 
-from tortoise.expressions import Q #allows for logic Querying 
-import logging 
 from app.utils.logger import create_logger, query_logger, delete_logger, error_logger
+
 
 logging.basicConfig(
     level=logging.INFO, # change to DEBUG for debugging 
@@ -15,17 +21,30 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 
-## Basic API test 
+# Pydantic schemas
+StudentOut = pydantic_model_creator(Student, name="StudentOut")
+StudentIn = pydantic_model_creator(
+    Student, 
+    name="StudentIn",
+    exclude_readonly=True, #id/created_at/updated_at excluded
+)
+
+
+## Basic API test DELETE WHEN IT WORKS
 @app.get("/")
 async def read_root():
     return {"message": "Hello World"}
 
 ##Create students 
-@app.post("/student/")
-async def create_student(name: str, email: str):
-    student = await Student.create(name=name, email=email)
-    create_logger.info(f"Created student: {student.name} ({student.email})")
-    return student
+@app.post("/student/", response_model=StudentOut)
+async def create_student(
+    first_name: str, 
+    last_name: str,
+    email: str
+):
+    student = await Student.create(first_name=first_name, last_name=last_name, email=email)
+    create_logger.info(f"Created student: {first_name} {last_name} ({email})")
+    return await StudentOut.from_tortoise_orm(student)
 
 
 ##Retrieve students 
