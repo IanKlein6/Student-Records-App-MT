@@ -90,4 +90,4 @@
   - 1 semester student flow: logic showing the logic of how a student progresses through the app
   - 2 semester student flow: explained. more in depth explaining of what happens in the app in regard to the student and their attempts and interaction with the examiner and scheduling. 
 - started on Diagram Request/Response Flow for critical Action
-  - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense. 
+  - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense.
