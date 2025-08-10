@@ -3,9 +3,10 @@
 from typing import Optional, List
 import logging
 
-from fastapi import FastAPI, Query, HTTPException, APIRouter 
+from fastapi import FastAPI, Query, HTTPException, Response, APIRouter 
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.pydantic import pydantic_model_creator
+from tortoise.exceptions import IntegrityError
 from tortoise.expressions import Q # allows for logic Querying
 
 from app.models.student import Student
@@ -35,16 +36,37 @@ StudentIn = pydantic_model_creator(
 async def read_root():
     return {"message": "Hello World"}
 
+
+
 ##Create students 
-@app.post("/student/", response_model=StudentOut)
-async def create_student(
-    first_name: str, 
-    last_name: str,
-    email: str
-):
-    student = await Student.create(first_name=first_name, last_name=last_name, email=email)
-    create_logger.info(f"Created student: {first_name} {last_name} ({email})")
+@app.post("/student/", response_model=StudentOut, status_code=201)
+async def create_student(payload: StudentCreate, response: Response):     
+    """Create a student. Returns 201 with the created resource.""" #OpenAPI/Swagger docs
+    try:    
+        student = await Student.create(
+            first_name=payload.first_name.strip(),
+            last_name=payload.last_name.strip(),
+            email = payload.email.strip().lower(), #normalize email
+        )
+
+    except IntegrityError:
+        # Unique email collision
+        raise HTTPException(status_code=409, detail="Email already exists")
+
+    response.headers["Location"] = f"/student/{student.id}"
+    
+    create_logger.info(
+        "student.create",
+        extra={
+            "first_name": student.first_name,
+            "last_name": student.last_name,
+            "email": student.email,
+            "student_id": student.id,
+        },
+    )
+
     return await StudentOut.from_tortoise_orm(student)
+
 
 
 ##Retrieve students 
