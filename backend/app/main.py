@@ -4,13 +4,14 @@ from typing import Optional, List
 import logging
 import os
 
-from fastapi import FastAPI, Query, HTTPException, Response, APIRouter 
+from fastapi import FastAPI, Path, Query, HTTPException, Response, APIRouter 
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.pydantic import pydantic_model_creator
 from tortoise.exceptions import IntegrityError
 from tortoise.expressions import Q # allows for logic Querying
 
 from app.models.student import Student
+from app.schemas.student import StudentIn, StudentOut
 from app.utils.logger import create_logger, query_logger, delete_logger, error_logger
 
 
@@ -23,7 +24,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+app = FastAPI(title="Student Records API")
 
 
 # Pydantic schemas
@@ -35,16 +36,16 @@ StudentIn = pydantic_model_creator(
 )
 
 
-## Basic API test DELETE WHEN IT WORKS
+## Basic API health test (uvicorn app.main:app --reload) (DELETE WHEN IT WORKS)
 @app.get("/")
-async def read_root():
-    return {"message": "Hello World"}
+async def health():
+    return {"message": "OK"}
 
 
 
 ##Create students 
 @app.post("/student/", response_model=StudentOut, status_code=201)
-async def create_student(payload: StudentCreate, response: Response):     
+async def create_student(payload: StudentIn, response: Response):     
     """Create a student. Returns 201 with the created resource.""" #OpenAPI/Swagger docs
     try:    
         student = await Student.create(
@@ -73,44 +74,16 @@ async def create_student(payload: StudentCreate, response: Response):
 
 
 
-##Retrieve students 
-@app.get("/student/")
-async def get_student(
-    name: Optional[list[str]] = Query(default=None), 
-    email: Optional[list[str]] = Query(default=None)
-):
-    filters = Q() #empty filter to alow for building of multiple filters
-
-    if name: #allows for multiple, varying types of queries to be searched in the same batch. 
-        name_filter = Q(name__icontains=name[0]) #name__icontains == non-case sensitive 
-        for n in name[1:]:
-            name_filter |= Q(name__icontains=n)
-        filters |= name_filter # |= is OR logic
-        query_logger.debug(f"Applying name filter(s): {name}")
-
-    if email:
-        email_filter = Q(email__icontains=email[0])
-        for e in email[1:]:
-            email_filter |= Q(email__icontains=e)
-        filters |= email_filter 
-        query_logger.debug(f"Applying email filter(s): {email}")
-
-    if name or email: #runs only if filter(s) were given 
-        query_logger.debug(f"Executing student search with combined filters: {filters}")
-        students = await Student.filter(filters).all()
-
-        if not students:
-            query_logger.info(f"No students found with filters: name={name}, email={email}")
-            raise HTTPException(status_code=404, detail="No matching students found")
-        
-        query_logger.info(f"Found {len(students)} student(s) with filters: name={name}, email={email}")
-        return {"students": students} #returns specified student
+##GET student by ID
+@app.get("/student/{student_id}", response_model=StudentOut)
+async def get_student_by_id(student_id: int = Path(..., ge=1)):
+    student = await Student.get_or_none(id=student_id)
+    if not student:
+        query_logger.warning("student.get_by_id.not_found id=%s", student_id)
+        raise HTTPException(status_code=404, detail="Student not found")
     
-    # Fallback: no filters 
-    all_students = await Student.all()
-    query_logger.info(f"Retrieved all students: total {len(all_students)}")
-    return {"All students": await Student.all()} #return all students
-   
+    query_logger.info("student.get_by_id.ok id=%s email=%s", student_id, student.email)
+    return await StudentOut.from_tortoise_orm(student)
 
 
 ##Delete students function 
