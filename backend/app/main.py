@@ -85,6 +85,37 @@ async def get_student_by_id(student_id: int = Path(..., ge=1)):
     query_logger.info("student.get_by_id.ok id=%s email=%s", student_id, student.email)
     return await StudentOut.from_tortoise_orm(student)
 
+##Get student with List/Filters
+@app.get("/student", response_model=List[StudentOut])
+async def list_student(
+    first_name: Optional[str] = Query(None),
+    last_name: Optional[str] = Query(None),
+    email: Optional[str] = Query(None),
+    limit: int = Query(50, ge=1, le=200), #CHANGE LIMIT IF NEEDED LATER    
+    offset: int = Query(0, ge=0),
+): 
+    #queryset build
+    qs = Student.all()
+
+    query_logger.debug(
+        "student.list request filters: first_name=%s last_name=%s email=%s limit=%s offset=%s", 
+        first_name, last_name, email, limit, offset
+    )
+
+    if first_name:
+        qs = qs.filter(first_name__icontains=first_name)
+    if last_name:
+        qs = qs.filter(last_name__icontains=last_name)
+    if email: 
+        qs = qs.filter(email__icontains=email)
+    
+    rows = await qs.limit(limit).offset(offset)
+
+    query_logger.info("student.list returned %d students", len(rows))
+
+    return [await StudentOut.from_tortoise_orm(r) for r in rows]
+    
+
 
 ##Delete students function 
 @app.delete("/student/") #Routing decorators. like urls.py in Django 
