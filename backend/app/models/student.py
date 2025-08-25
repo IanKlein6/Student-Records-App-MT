@@ -30,6 +30,7 @@ class Student(Model):
 
     work_student_potential = fields.CharEnumField(WorkPotential, null=True)
     
+    archived_at = 
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
