@@ -4,7 +4,9 @@ from typing import Optional, List
 import logging
 import os
 
-from fastapi import FastAPI, Path, Query, HTTPException, Response, APIRouter 
+
+from fastapi import FastAPI, Path, Query, HTTPException, Response, APIRouter, Body
+from pydantic import BaseModel, EmailStr, field_validator
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.pydantic import pydantic_model_creator
 from tortoise.exceptions import IntegrityError
@@ -22,7 +24,7 @@ logging.basicConfig(
     level=logging.INFO, # change to DEBUG for debugging 
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("student")
 
 app = FastAPI(title="Student Records API")
 
@@ -115,6 +117,50 @@ async def list_student(
 
     return [await StudentOut.from_tortoise_orm(r) for r in rows]
     
+## Patch student
+class StudentPatch(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+    @field_validator("first_name", "last_name", mode="before")
+    @classmethod
+    def _trim(cls, v):
+        return v.strip() if isinstance(v, str) else v
+    
+    @field_validator("email", mode="before")
+    @classmethod
+    def _normalize_email(cls, v):
+        return v.strip().lower() if isinstance(v, str) else v
+
+@app.patch("/student/{student_id}", response_model=StudentOut)
+async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
+    create_logger.debug(
+            "student.patch start id=%s payload=%s",
+            student_id, payload.model_dump(exclude_none=True)
+        )
+    student = await Student.get_or_none(id=student_id)
+    if not student:
+        create_logger.warning("student.patch not_found id=%s", student_id)
+        raise HTTPException(status_code=404, detail="Student not found")
+    
+    #if changing email, enforce uniqueness
+    if payload.email and payload.email != student.email:
+        exists = await Student.filter(email=payload.email).exclude(id=student_id).exist
+        if exists:
+            logger.info("student.patch email_conflict id=%s email=%s", student_id, payload.email)
+            raise HTTPException(status_code=409, details="Email already exists")
+        
+    # apply changes
+    if payload.first_name is not None:
+        student.first_name = payload.first_name
+    if payload.last_name is not None:
+        student.last_name = payload.last_name
+    if payload.email is not None:
+        student.email = payload.email
+    
+    await student.save()
+    return await StudentOut.from_tortoise_orm(student)
 
 
 ##Delete students function 
