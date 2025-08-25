@@ -23,7 +23,7 @@ pytest-asyncio = "^1.0.0"
 pytest-env = "^1.1.5"
 
 [tool.aerich]
-tortoise_orm = "tortoise_config.TORTOISE_ORM"
+tortoise_orm = "app.config.TORTOISE_ORM"
 location = "./migrations"
 src_folder = "./."
 

@@ -1,7 +1,7 @@
 # test_students.py
 import pytest
 
-# Name check
+# Name check create
 @pytest.mark.asyncio
 async def test_create_student_success(async_client):
     payload = {
@@ -53,6 +53,12 @@ async def test_create_student_location(async_client):
     # Extract id and check its's an int-like string
     student_id = location.rsplit("/", 1)[-1]
     assert student_id.isdigit()
+
+
+# get with filters test
+# Patch test
+# Delete test
+
 
      # OPTIONAL (enable later): if you add GET /student/{id}, verify it resolves
     # r2 = await async_client.get(location)

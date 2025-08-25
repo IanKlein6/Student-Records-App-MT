@@ -19,6 +19,7 @@ class Student(Model):
     first_name = fields.CharField(max_length=50)
     last_name = fields.CharField(max_length=50)
     email = fields.CharField(max_length=100, unique=True)
+    notes = fields.CharField(max_length=255, null=True)
 
     semester = fields.ForeignKeyField("models.Semester", related_name="students", null=True)
     group = fields.ForeignKeyField("models.Group", related_name="students", null=True)
