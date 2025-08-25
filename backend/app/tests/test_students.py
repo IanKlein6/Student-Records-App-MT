@@ -10,7 +10,7 @@ async def test_create_student_success(async_client):
         "email": " ALEXHEARTT@TEST1.com"
     }
 
-    r = await async_client.post("/student/", json=payload)
+    r = await async_client.post("/student", json=payload)
     assert r.status_code == 201
     data = r.json()
     assert data["first_name"] == "Alex"
@@ -26,10 +26,10 @@ async def test_create_student_duplicate_email(async_client):
         "last_name": "Hopper",
         "email": "dup@example.com"
     }
-    r1 = await async_client.post("/student/", json=payload)
+    r1 = await async_client.post("/student", json=payload)
     assert r1.status_code == 201
 
-    r2 = await async_client.post("/student/", json=payload)
+    r2 = await async_client.post("/student", json=payload)
     assert r2.status_code == 409
     assert r2.json()["detail"] == "Email already exists"
 
@@ -42,16 +42,16 @@ async def test_create_student_location(async_client):
         "email": "turing@example.com",
     }
     
-    r = await async_client.post("/student/", json=payload)
+    r = await async_client.post("/student", json=payload)
     assert r.status_code == 201
 
     # Header exists and points to the new resource
     assert "Location" in r.headers
     location = r.headers["Location"]
-    assert location.startswith("/student/")
+    assert location.startswith("/student")
 
     # Extract id and check its's an int-like string
-    student_id = location.split("/student/")[-1]
+    student_id = location.split("/student")[-1]
     assert student_id.isdigit()
 
      # OPTIONAL (enable later): if you add GET /student/{id}, verify it resolves
