@@ -56,7 +56,7 @@ async def create_student(payload: StudentCreate, response: Response):
         },
     )
 
-    return await StudentRead.from_tortoise_orm(student)
+    return StudentRead.model_validate(student, from_attributes=True)
 
 
 ##GET student by ID
@@ -68,7 +68,7 @@ async def get_student_by_id(student_id: int = Path(..., ge=1)):
         raise HTTPException(status_code=404, detail="Student not found")
     
     logger.info("student.get_by_id.ok id=%s email=%s", student_id, student.email)
-    return await StudentRead.from_tortoise_orm(student)
+    return StudentRead.model_validate(student, from_attributes=True)
 
 ##Get student with List/Filters
 @app.get("/student", response_model=List[StudentList])
@@ -139,7 +139,7 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
         raise HTTPException(status_code=409, detail="Email already exists")
     
     logger.info("student.patch ok id=%s", student_id)
-    return await StudentRead.from_tortoise_orm(student)
+    return StudentRead.model_validate(student, from_attributes=True)
 
 
 ##Delete students function 

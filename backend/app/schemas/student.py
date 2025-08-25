@@ -1,6 +1,7 @@
 # app/schemas/student.py
 from app.models.student import Student, StudentStatus, WorkPotential
-from pydantic import BaseModel, EmailStr, Optional, StringConstraints
+from pydantic import BaseModel, EmailStr, StringConstraints
+from datetime import datetime
 from typing import Annotated, Optional
 
 class StudentCreate(BaseModel):
@@ -19,22 +20,22 @@ class StudentPatch(BaseModel):
     work_student_potential: Optional[WorkPotential] = None
 
 
-# Add classes for different usecases in the future. e.i. if the front end only needs a list of names then create a schema where only names get pushed. also for security dont push things that dont need to be. 
+# Add classes for different use cases in the future. e.i. if the front end only needs a list of names then create a schema where only names get pushed. also for security dont push things that dont need to be. 
 class StudentRead(BaseModel):
-    id = int
+    id: int
     first_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
     last_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
     email: EmailStr
-    semester_id: int
+    semester_id: Optional[int]
     status: StudentStatus
     
     notes: Optional[str] = None 
-    work_student_potential: WorkPotential
+    work_student_potential: Optional[WorkPotential]
     group_id: Optional[int] = None
     attempt_num: int
     
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
