@@ -179,7 +179,11 @@ if not TESTING:
     register_tortoise( 
         app, #app instance being connected. Core Object 
         db_url="postgres://postgres:postgres@localhost:5432/student_records",
-        modules={"models": ["app.models.student"]},
+        modules={"models": [
+            "app.models.student",
+            "app.models.group",
+            "app.models.semester"
+            ]},
         generate_schemas=False,
         add_exception_handlers=True,
     )

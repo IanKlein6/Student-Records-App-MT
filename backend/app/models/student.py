@@ -1,3 +1,4 @@
+# app/models/student.py
 from enum import Enum
 from tortoise import fields
 from tortoise.models import Model
@@ -14,7 +15,7 @@ class WorkPotential(str, Enum):
     HIGH = "high"
 
 class Student(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     first_name = fields.CharField(max_length=50)
     last_name = fields.CharField(max_length=50)
     email = fields.CharField(max_length=100, unique=True)
@@ -35,4 +36,6 @@ class Student(Model):
         return f"{self.first_name} {self.last_name}"
 
     class Meta:
-        indexes = [("last_name", "first_name"), "status",]
+        indexes = [
+            ("last_name", "first_name"), ("status",),
+            ]

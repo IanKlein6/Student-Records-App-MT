@@ -4,4 +4,4 @@ from tortoise.models import Model
 
 class Semester(Model):
     id = fields.IntField(pk=True)
-    name = fields.CharField(max_length=100)
+    name = fields.CharField(max_length=100, unique=True)

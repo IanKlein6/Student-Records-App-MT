@@ -48,10 +48,10 @@ async def test_create_student_location(async_client):
     # Header exists and points to the new resource
     assert "Location" in r.headers
     location = r.headers["Location"]
-    assert location.startswith("/student")
+    assert location.startswith("/student/")
 
     # Extract id and check its's an int-like string
-    student_id = location.split("/student")[-1]
+    student_id = location.rsplit("/", 1)[-1]
     assert student_id.isdigit()
 
      # OPTIONAL (enable later): if you add GET /student/{id}, verify it resolves

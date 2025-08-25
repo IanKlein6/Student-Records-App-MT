@@ -9,7 +9,9 @@ from app.main import app  # Ensure this points to the FastAPI app
 
 # Points Tortoise to your models module. Add models as needed
 MODELS = {"models": [
-    "app.models.student"
+    "app.models.student",
+    "app.models.group",
+    "app.models.semester",
 ]} 
 
 #Generation of session DB
