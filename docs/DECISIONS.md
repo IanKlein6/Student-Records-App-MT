@@ -79,3 +79,14 @@ Reason: meta instead of inline because simpler coding and overview.
 
 ## 09-08-25 Composite indexes
 Reason: used when possible for indexes that are frequently searched
+
+## 23-08-25 Student API Design
+- Keep schemas in app/schemas/ instead of main.py for clarity and re-use.
+- POST /student/ must trim names and lowercase emails before saving. Duplicate emails → 409 Conflict.
+- GET endpoints split into:
+    - /student/{id} → fetch one by ID, 404 if missing.
+    - /student → list with filters + pagination, returns always a list.
+- PATCH /student/{id} is introduced for partial updates.
+    - Scope limited to safe profile fields (first_name, last_name, email).
+    - Business-logic fields (status, attempt_num, semester, group) will be handled by separate workflow endpoints, not raw PATCH.
+- DELETE /student/{id} returns 204 No Content on success, 404 if missing.

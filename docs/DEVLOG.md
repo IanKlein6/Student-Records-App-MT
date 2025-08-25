@@ -103,3 +103,29 @@
   - added created_at to see when the profile was created
   - added meta indexes last_name and first_name for easy sorting
   - single index on status for see who's active
+
+## 2025-08-23 - Backend progress on Student model & endpoints
+- Fixed test setup
+    - Clarified that test_students.py is testing the FastAPI routes, not the model directly.
+  - Confirmed current tests cover POST /student (success, duplicate email → 409, Location header).
+- Refactored schemas
+    - Moved Pydantic model creators (StudentIn, StudentOut) out of main.py into a new app/schemas/student.py.
+    - Reason: avoids bloating main.py, enables re-use across multiple routers/models.
+- Implemented Student endpoints in main.py
+  - POST /student/ — create with trimming + lowercase email, handle duplicates with IntegrityError → 409, return 201 + Location header.
+  - GET /student/{id} — fetch by primary key, return 404 if not found.
+  - GET /student — list/search with optional filters (first_name, last_name, email) and pagination (limit, offset).
+  - PATCH /student/{id} — partial updates with custom schema (StudentPatch), normalization via Pydantic validators, duplicate email check, return updated record.
+   - DELETE /student/{id} — delete by ID, return 204 if deleted, 404 otherwise.
+- Added logging to routes
+ - Created dedicated logger for student operations.
+ - Logging at different levels:
+    - debug → request filters, incoming payloads.
+    - info → successful creations, updates, number of results.
+    - warning → not found cases.
+    - error → DB or save errors.
+- Removed duplicate model definition
+  - Ensured Student model only exists in app/models/student.py (was duplicated in main.py).
+- PATCH design discussion
+  - Narrow PATCH (names + email only) vs Broad PATCH (include status, group, semester, etc).
+  - Currently using narrow PATCH for profile fields. Other fields will be updated via domain-specific endpoints (e.g., retries, reassignments).
