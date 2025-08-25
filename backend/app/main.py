@@ -98,7 +98,7 @@ async def list_student(
 
     logger.info("student.list returned %d students", len(rows))
 
-    return [await StudentList.from_tortoise_orm(r) for r in rows]
+    return [StudentList.model_validate(r, from_attributes=True) for r in rows]
     
 
 ## Patch student

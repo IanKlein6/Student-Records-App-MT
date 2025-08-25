@@ -41,6 +41,7 @@ class StudentRead(BaseModel):
         from_attributes = True
 
 class StudentList(BaseModel):
+    id: int
     first_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
     last_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
     email: EmailStr
