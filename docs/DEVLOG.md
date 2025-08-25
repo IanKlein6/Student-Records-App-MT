@@ -129,3 +129,65 @@
 - PATCH design discussion
   - Narrow PATCH (names + email only) vs Broad PATCH (include status, group, semester, etc).
   - Currently using narrow PATCH for profile fields. Other fields will be updated via domain-specific endpoints (e.g., retries, reassignments).
+
+## 25-08-2025
+
+ORM & Migrations
+  Extended Student Tortoise model:
+    Fields: id, first_name, last_name, email (unique), semester (FK), group (FK), status (enum), attempt_num, work_student_potential (enum), notes, created_at, updated_at.
+  Indexes: (last_name, first_name) and status.
+Set up Aerich for migrations (using app.config.TORTOISE_ORM):
+Resolved KeyError: 'default' / config path issues.
+Handled No such option: -m (Aerich’s migrate has no -m flag).
+Generated migration file and applied upgrade.
+Resolved DB connectivity by using existing Dockerized Postgres (student_records_postgres on 5432).
+Fixed a NOT NULL migration failure by ensuring new schema and data alignment (ultimately applied clean migration).
+Verified resulting DB schema (columns, FKs, indexes) via psql.
+API & Schemas (Pydantic v2)
+Introduced hand-written schemas (Pydantic v2 style):
+StudentCreate (required: first_name, last_name, email, semester_id).
+StudentPatch (all optional): includes status, notes, group_id, work_student_potential.
+StudentRead (response): full record with id, timestamps, etc. (semester_id, work_student_potential, group_id, notes set as optional to match DB nullability; timestamps typed as datetime).
+StudentList (lightweight list view): includes id, first_name, last_name, status.
+Used Annotated[str, StringConstraints(...)] (Pydantic v2) instead of deprecated constr.
+Reused model enums StudentStatus and WorkPotential in schemas.
+Normalized mapping from ORM → schema using:
+StudentRead.model_validate(obj, from_attributes=True)
+StudentList.model_validate(obj, from_attributes=True)
+(Replaced Tortoise’s deprecated from_tortoise_orm used by auto-generated models.)
+Removed redundant in-route trimming/validation; validation now lives in schemas.
+Kept email uniqueness checks at the DB layer; return 409 on conflicts.
+Endpoints (current behavior)
+GET /student — paginated list w/ filters (first_name, last_name, email), returns List[StudentList].
+GET /student/{id} — returns StudentRead, 404 if not found.
+POST /student — accepts StudentCreate, returns StudentRead; 422 on validation errors, 409 on duplicate email.
+PATCH /student/{id} — accepts StudentPatch, returns StudentRead; 404 on missing, 422 on validation errors, 409 on email conflict; rejects empty body with 400.
+DELETE /student/{id} — currently hard delete (returns 204).
+(Acceptance asked for soft delete; see Decisions/TODO.)
+All endpoints manually exercised via Swagger UI (/docs).
+Tooling & Environment
+VS Code “import could not be resolved” fixed by selecting the Poetry venv interpreter.
+Confirmed Pydantic 2.11.7; switched to v2 API.
+Installed Uvicorn and resolved version constraints; running on 0.34.3.
+App runs with poetry run uvicorn app.main:app --reload; verified /docs and /openapi.json.
+Manual test highlights
+Verified:
+POST /student → 201 on success; 422 on bad email or missing required fields; 409 on duplicate email.
+GET /student/{id} → 200 with full record; 404 if not found.
+GET /student → returns slim list (IDs present for UI actions).
+PATCH /student/{id} → 200 with updated record; 400 for empty body; 409 on email conflict.
+DELETE /student/{id} → 204; 404 on non-existent ID.
+Confirmed schema serialization of datetime fields; optional DB fields mapped as optional in responses.
+
+TODO (next)
+Implement soft delete logic in DELETE /student/{id}:
+await Student.filter(id=student_id).update(status=StudentStatus.ARCHIVED)
+Return 204; 404 if not found.
+Add plural route aliases (/students, /students/{id}) pointing to existing handlers.
+Add pytest coverage for:
+422 cases (bad email, missing required fields).
+409 duplicate email.
+404 for get/patch/delete non-existent.
+Soft delete behavior (status changes to archived, not removed).
+(Optional) A small lookup endpoint/usage pattern in the UI for delete-by-name UX (frontend uses /students?first_name=…&last_name=…, then deletes by ID).
+(Optional) Add a scripts entry in pyproject.toml for a shorter dev command (e.g., poetry run dev → runs Uvicorn).
