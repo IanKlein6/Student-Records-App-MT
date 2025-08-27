@@ -3,13 +3,13 @@
 
 import logging, os
 from typing import Optional, List
-from app.models.student import Student
-from app.schemas.student import StudentCreate, StudentPatch, StudentRead, StudentList
-
 from fastapi import FastAPI, Path, Query, HTTPException, Response, Body
-from pydantic import BaseModel, EmailStr, field_validator
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import IntegrityError
+
+from app.models.student import Student, StudentStatus
+from app.schemas.student import (StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest)
+from app.services.students import hard_delete_student
 
 
 #Testing potentially remove for production
@@ -117,21 +117,42 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
     if not payload.model_dump(exclude_none=True):
         raise HTTPException(status_code=400, detail="No fields provided")
 
-    #if changing email, enforce uniqueness
+    #if changing email, enforce uniqueness. Email uniqueness
     if payload.email and payload.email != student.email:
         exists = await Student.filter(email=payload.email).exclude(id=student_id).exists()
         if exists:
             logger.info("student.patch email_conflict id=%s email=%s", student_id, payload.email)
             raise HTTPException(status_code=409, detail="Email already exists")
 
-    # apply changes
+    # apply fields
     if payload.first_name is not None:
         student.first_name = payload.first_name
     if payload.last_name is not None:
         student.last_name = payload.last_name
     if payload.email is not None:
-        student.email = payload.email
+        student.email = payload.email 
+    if payload.notes is not None:
+        student.notes = payload.notes
+    if payload.group_id is not None:
+        student.group_id = payload.group_id
+    if payload.semester_id is not None:
+        student.semester_id = payload.semester_id
+    if payload.work_student_potential is not None:
+        student.work_student_potential = payload.work_student_potential
     
+    # Handle status transitions that affect archive state
+    if payload.status is not None:
+        if payload.status == StudentStatus.ARCHIVED:
+            await student.archive("PATCH: status=archived")
+            student = await Student.get(id=student_id)
+        else:
+            # If currently archived and caller sets a non-ARCHIVED status restore first. 
+            if student.is_archived:
+                await student.restore("PATCH: status!=archived")
+                student = await Student.get(id=student_id)
+            student.status = payload.status
+
+    # save if not archived transition already saved
     try: 
         await student.save()
     except IntegrityError:
