@@ -1,14 +1,17 @@
 # app/models/student.py
 from enum import Enum
+from datetime import datetime
 from tortoise import fields
 from tortoise.models import Model
 
+# Options for student active status
 class StudentStatus(str, Enum):
     ACTIVE = "active"
     PASSED = "passed"
     FAILED = "failed"
     ARCHIVED = "archived"
 
+# rating for student potential for workstudent
 class WorkPotential(str, Enum):
     LOW = "low"
     MEDIUM = "medium"
@@ -33,15 +36,34 @@ class Student(Model):
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
+    # Checks if student is archived or not
     @property # allows access like student.is_archived
     def is_archived(self) -> bool:
         return self.archived_at is not None # = True if archived_at has a value
     
+    # Return request
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
     class Meta:
         indexes = [("last_name", "first_name"), ("status",),]
+
+    # Invariant enforcing helpers for logging the archiving/restoring of students. centralized 
+    async def archive(self, reason: str | None = None) -> None:
+        if not self.archived_at:
+            return
+        self.archived_at = None 
+        self.status = StudentStatus.ACTIVE
+        await self.save()
+        await ArchiveLog.create(student=self, action=ArchiveAction.RESTORE, reason=reason)
+
+    async def restore(self, reason: str | None = None) -> None:
+        if not self.archive_at:
+            return
+        self.archived_at = None
+        self.status = StudentStatus.ACTIVE
+        await self.save()
+        await ArchiveLog.create(student=self, action=ArchiveAction.RESTORE, reason=reason)
 
 class ArchiveAction(str, Enum):
     ARCHIVE = "archive"
