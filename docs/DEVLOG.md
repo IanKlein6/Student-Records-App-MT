@@ -195,3 +195,55 @@ Add pytest coverage for:
 Soft delete behavior (status changes to archived, not removed).
 (Optional) A small lookup endpoint/usage pattern in the UI for delete-by-name UX (frontend uses /students?first_name=…&last_name=…, then deletes by ID).
 (Optional) Add a scripts entry in pyproject.toml for a shorter dev command (e.g., poetry run dev → runs Uvicorn).
+
+## 27-08-25
+Summary
+Consolidated a robust archive/restore flow for Student, tightened PATCH semantics, normalized email handling, added dedicated endpoints for archive/restore, and made deletion soft by default with a hard-delete escape hatch. Also clarified tiny request bodies and when to choose BaseModel vs other options.
+Changes by file
+app/models/student.py
+Added invariant-enforcing helpers:
+async def archive(self, reason: str | None = None) -> None
+async def restore(self, reason: str | None = None) -> None
+Both write to ArchiveLog, set status, and set/clear archived_at (UTC), idempotently.
+Kept/used ArchiveAction and ArchiveLog for auditability.
+Left is_archived convenience property.
+app/services/students.py (new)
+Added async def hard_delete_student(student, reason=None) -> None:
+Logs HARD_DELETE first, then await student.delete().
+app/schemas/student.py
+Create/Patch validators:
+@field_validator("email", mode="before") to strip() and lower() emails.
+Patch model alignment:
+group_id, semester_id, notes, work_student_potential, status supported.
+Tiny request bodies:
+ArchiveRequest and RestoreRequest with optional reason.
+app/main.py
+Create: persists semester_id; normalizes email.
+List: adds include_archived (default False) to exclude archived rows unless requested.
+Patch:
+Applies all declared fields (notes, group_id, semester_id, work_student_potential, etc.).
+Status transitions:
+If status == ARCHIVED → call student.archive(...).
+If currently archived and status != ARCHIVED → call student.restore(...), then set new status.
+Email uniqueness enforced on change.
+Archive/Restore endpoints:
+POST /student/{id}/archive (body: {"reason": "..."} | {}) → 204
+POST /student/{id}/restore (body: {"reason": "..."} | {}) → 204
+Delete:
+Soft-delete by default → student.archive(reason or "DELETE soft").
+Hard-delete via ?hard=1 → hard_delete_student(student, reason).
+Tortoise config:
+Enabled use_tz=True, timezone="UTC" so archived_at is tz-aware and consistent.
+Quick checks done
+Duplicate email on create → 409.
+PATCH with empty body → 400.
+PATCH status=archived sets archived_at and logs.
+POST /student/{id}/restore clears archived_at and logs.
+GET /student excludes archived unless include_archived=true.
+DELETE defaults to soft; ?hard=1 performs hard delete with log.
+
+Suggested next steps
+ Add tests for archive/restore/hard-delete flows (including idempotency).
+ Expose ArchiveLog via an admin-only GET /student/{id}/archive-log.
+ Enforce “archived students cannot be assigned to groups or scheduled” at the service layer.
+ Plan cross-model side effects for archiving (e.g., cancel Calendar events) and move logic to a domain service when needed.

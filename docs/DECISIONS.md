@@ -123,3 +123,35 @@ Routing Conventions
 - Current routes use /student.
     - Decision: expose plural aliases to match spec (/students, /students/{id}) while keeping current paths for backward compatibility.
     - Rationale: aligns with REST naming without breaking existing usage.
+
+## 27-08-25
+Archiving location
+Decision: Put archive() / restore() on the Student model for now.
+Rationale: Centralizes invariants; ergonomic calls from anywhere; easy to evolve.
+Note: Consider moving to a service if archiving later touches cross-model side effects (e.g., cancel calendar events, detach groups).
+Hard delete policy
+Decision: Keep hard delete in app/services/students.py (hard_delete_student).
+Rationale: Likely to gain cross-model behavior; safer separation from router.
+Audit logging
+Decision: Always write ArchiveLog entries for ARCHIVE, RESTORE, and HARD_DELETE.
+Rationale: Traceability and compliance; supports future admin UI.
+Time handling
+Decision: Store archived_at as UTC, tz-aware (use_tz=True, timezone="UTC").
+Rationale: Consistency across services and logs.
+Email normalization
+Decision: Normalize emails to lowercase + trimmed at ingress.
+Rationale: Prevents duplicate-appearing accounts; aligns with practical provider behavior.
+API shape for archive/restore
+Decision: Use BaseModel bodies (ArchiveRequest / RestoreRequest) with optional reason.
+Rationale: Clear schema, easy to extend (e.g., notify: bool, actor_id).
+Soft-delete default
+Decision: DELETE /student/{id} performs soft delete by default; hard delete only with ?hard=1.
+Rationale: Safety first; preserves history unless explicitly overridden.
+Listing semantics
+Decision: GET /student excludes archived by default; opt-in via include_archived=true.
+Rationale: Mirrors typical “active-first” views; keeps UI uncluttered.
+PATCH semantics around archiving
+Decision: Status transitions must route through helpers:
+Setting status=ARCHIVED → student.archive(...).
+Changing status away from ARCHIVED → student.restore(...) first.
+Rationale: Guarantees status ⇄ archived_at invariants and audit logging.
