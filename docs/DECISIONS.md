@@ -68,17 +68,15 @@ Reason: Group affiliation is not needed at the `attempt` level since scheduling 
 ## 2025-08-03 Appointments Link Students, Technika, and Slots  
 Reason: The `appointments` table serves as the source of truth for scheduling, tying together the student, technika, and time slot in one place.
 
-## 09-08-25 Enum fields will use CharEnumField
-Reason: decided to use Enum because FrozenSets are not available in Tortoise. 
-
-## 09-08-25 Time Stamp created in Student
-Reason: time stamp helps see when the student was created/ when they started
-
-## 09-08-25 Indexs will be meta in models
-Reason: meta instead of inline because simpler coding and overview. 
-
-## 09-08-25 Composite indexes
-Reason: used when possible for indexes that are frequently searched
+## 09-08-25 
+- Enum fields will use CharEnumField
+    - Reason: decided to use Enum because FrozenSets are not available in Tortoise. 
+- Time Stamp created in Student
+    - Reason: time stamp helps see when the student was created/ when they started
+- Indexs will be meta in models
+    - Reason: meta instead of inline because simpler coding and overview. 
+- Composite indexes
+    - Reason: used when possible for indexes that are frequently searched
 
 ## 23-08-25 Student API Design
 - Keep schemas in app/schemas/ instead of main.py for clarity and re-use.
@@ -93,30 +91,35 @@ Reason: used when possible for indexes that are frequently searched
 
 25-08-25
 Schema & Validation
-Adopt Pydantic v2 style using Annotated + StringConstraints and built-in types like EmailStr.
-Rationale: forward-compatible (v3 will deprecate con* types), better static analysis.
-Keep validation in schemas, not in route functions (aside from DB constraints like uniqueness).
-Reuse model enums (StudentStatus, WorkPotential) in schemas to guarantee consistency.
+- Adopt Pydantic v2 style using Annotated + StringConstraints and built-in types like EmailStr.
+    - Rationale: forward-compatible (v3 will deprecate con* types), better static analysis.
+- Keep validation in schemas, not in route functions (aside from DB constraints like uniqueness).
+- Reuse model enums (StudentStatus, WorkPotential) in schemas to guarantee consistency.
+
 API Shape & Data Exposure
-Schema layering:
-Use StudentList for list endpoints (minimal fields).
-Use StudentRead for detail endpoints (full fields).
-Rationale: efficiency, security (don’t over-expose), and clarity.
-ID-based mutations (PATCH/DELETE) remain the contract.
-Frontend performs search by name/email via list endpoint, then acts using the returned ID.
-Rationale: uniqueness and safety while remaining user-friendly.
+- Schema layering:
+    - Use StudentList for list endpoints (minimal fields).
+    - Use StudentRead for detail endpoints (full fields).
+    - Rationale: efficiency, security (don’t over-expose), and clarity.
+- ID-based mutations (PATCH/DELETE) remain the contract.
+    - Frontend performs search by name/email via list endpoint, then acts using the returned ID.
+    - Rationale: uniqueness and safety while remaining user-friendly.
+
 ORM ↔︎ Schema Mapping
-Prefer model_validate(..., from_attributes=True) for mapping ORM objects to custom Pydantic models.
-Rationale: eliminates dependency on Tortoise’s auto-generated Pydantic models and their async helpers.
+- Prefer model_validate(..., from_attributes=True) for mapping ORM objects to custom Pydantic models.
+    - Rationale: eliminates dependency on Tortoise’s auto-generated Pydantic models and their async helpers.
+
 Migrations & Database
-Use Aerich for Tortoise migrations, configured via app.config.TORTOISE_ORM.
-Keep email unique at DB; surface 409 Conflict on violations.
-Nullable fields in DB (e.g., semester_id, work_student_potential, group_id, notes) are represented as optional in response schemas to match reality.
-Create schema still requires semester_id.
+- Use Aerich for Tortoise migrations, configured via app.config.TORTOISE_ORM.
+- Keep email unique at DB; surface 409 Conflict on violations.
+- Nullable fields in DB (e.g., semester_id, work_student_potential, group_id, notes) are represented as optional in response schemas to match reality.
+    - Create schema still requires semester_id.
+
 Deletion Strategy
-Decision: switch DELETE from hard delete to soft delete by setting status="archived" and returning 204.
-Rationale: matches acceptance criteria; preserves history and referential integrity.
+- Decision: switch DELETE from hard delete to soft delete by setting status="archived" and returning 204.
+    - Rationale: matches acceptance criteria; preserves history and referential integrity.
+
 Routing Conventions
-Current routes use /student.
-Decision: expose plural aliases to match spec (/students, /students/{id}) while keeping current paths for backward compatibility.
-Rationale: aligns with REST naming without breaking existing usage.
+- Current routes use /student.
+    - Decision: expose plural aliases to match spec (/students, /students/{id}) while keeping current paths for backward compatibility.
+    - Rationale: aligns with REST naming without breaking existing usage.
