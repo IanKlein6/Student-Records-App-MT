@@ -1,6 +1,6 @@
 # app/schemas/student.py
 from app.models.student import Student, StudentStatus, WorkPotential
-from pydantic import BaseModel, EmailStr, StringConstraints
+from pydantic import BaseModel, EmailStr, StringConstraints, field_validator
 from datetime import datetime
 from typing import Annotated, Optional
 
@@ -19,6 +19,12 @@ class StudentPatch(BaseModel):
     group: Optional[int] = None
     work_student_potential: Optional[WorkPotential] = None
 
+    #email normalizer 
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v: Optional[str]) -> Optional[str]:
+        return v.strip().lower() if v else v
+
 
 # Add classes for different use cases in the future. e.i. if the front end only needs a list of names then create a schema where only names get pushed. also for security dont push things that dont need to be. 
 class StudentRead(BaseModel):
@@ -28,12 +34,10 @@ class StudentRead(BaseModel):
     email: EmailStr
     semester_id: Optional[int]
     status: StudentStatus
-    
     notes: Optional[str] = None 
     work_student_potential: Optional[WorkPotential]
     group_id: Optional[int] = None
     attempt_num: int
-    
     created_at: datetime
     updated_at: datetime
 
@@ -45,3 +49,10 @@ class StudentList(BaseModel):
     first_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
     last_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
     email: EmailStr
+
+# Archive and Restore endpoint bodies
+class ArchiveRequest(BaseModel):
+    reason: Optional[str] = None
+
+class RestoreRequest(BaseModel):
+    reason: Optional[str] = None
