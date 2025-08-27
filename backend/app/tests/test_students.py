@@ -1,4 +1,4 @@
-# test_students.py
+# app/tests/test_students.py
 import pytest
 
 # Name check create
