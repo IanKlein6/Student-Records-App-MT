@@ -163,6 +163,25 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
     return StudentRead.model_validate(student, from_attributes=True)
 
 
+## Archive/ Restore endpoints
+@app.post("student/{student_id}/archive", status_code=204)
+async def archive_student(student_id: int, body: ArchiveRequest = Body(default=ArchiveRequest())):
+    student = await Student.get_or_none(id=student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    await student.archive(body.reason)
+    return Response(status_code=204)
+
+@app.post ("/student/{student_id}/restore", status_code=204)
+async def restore_student(student_id: int, body: RestoreRequest = Body(default=RestoreRequest())):
+    student = await Student.get_or_none(id=student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+    await student.restore(body.reason)
+    return Response(status_code=204)
+
+
+
 ##Delete students function 
 @app.delete("/student/{student_id}", status_code=204)
 async def delete_student_by_id(student_id: int = Path(..., ge=1)):
