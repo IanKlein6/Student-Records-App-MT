@@ -1,4 +1,3 @@
-
 # app/main.py
 
 import logging, os
@@ -115,6 +114,7 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
     
     # Reject empty body
     if not payload.model_dump(exclude_none=True):
+        logger.warning("student.patch empty payload body id=%s", student_id)
         raise HTTPException(status_code=400, detail="No fields provided")
 
     #if changing email, enforce uniqueness. Email uniqueness
@@ -145,6 +145,7 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
         if payload.status == StudentStatus.ARCHIVED:
             await student.archive("PATCH: status=archived")
             student = await Student.get(id=student_id)
+            logger.info("student.patch get archived student id%s", student_id)
         else:
             # If currently archived and caller sets a non-ARCHIVED status restore first. 
             if student.is_archived:
@@ -163,21 +164,26 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
     return StudentRead.model_validate(student, from_attributes=True)
 
 
-## Archive/ Restore endpoints
+## Archive endpoints
 @app.post("student/{student_id}/archive", status_code=204)
 async def archive_student(student_id: int, body: ArchiveRequest = Body(default=ArchiveRequest())):
     student = await Student.get_or_none(id=student_id)
     if not student:
+        logger.error("student.archive/restore student id%s not found", student_id)
         raise HTTPException(status_code=404, detail="Student not found")
     await student.archive(body.reason)
+    logger.info("student.archive/restore student id%s archived successfully", student_id)
     return Response(status_code=204)
 
+## Restore endpoints
 @app.post ("/student/{student_id}/restore", status_code=204)
 async def restore_student(student_id: int, body: RestoreRequest = Body(default=RestoreRequest())):
     student = await Student.get_or_none(id=student_id)
     if not student:
+        logger.error("student.restore student id%s not found", student_id)
         raise HTTPException(status_code=404, detail="Student not found")
     await student.restore(body.reason)
+    logger.info("student.restore student id%s successfully restored")
     return Response(status_code=204)
 
 
