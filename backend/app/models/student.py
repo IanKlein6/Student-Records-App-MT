@@ -4,7 +4,6 @@ from enum import Enum
 from datetime import datetime
 from tortoise import fields
 from tortoise.models import Model
-from app.models.student import ArchiveLog, ArchiveAction, StudentStatus
 
 # Options for student active status
 class StudentStatus(str, Enum):
@@ -52,17 +51,15 @@ class Student(Model):
 
     # Invariant enforcing helpers for logging the archiving/restoring of students. centralized 
     async def archive(self, reason: str | None = None) -> None:
-        if not self.archived_at:
-            await ArchiveLog.create(student=self, action=ArchiveAction.ARCHIVE, reason=reason)
+        if self.archived_at:
             return
         self.archived_at = datetime.utcnow()
-        self.status = StudentStatus.ACTIVE
+        self.status = StudentStatus.ARCHIVED
         await self.save()
         await ArchiveLog.create(student=self, action=ArchiveAction.ARCHIVE, reason=reason)
 
     async def restore(self, reason: str | None = None) -> None:
-        if not self.archive_at:
-            await ArchiveLog.create(student=self, action=ArchiveAction.RESTORE, reason=reason)
+        if not self.archived_at:
             return
         self.archived_at = None
         self.status = StudentStatus.ACTIVE

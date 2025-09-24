@@ -2,7 +2,7 @@
 
 import logging, os
 from typing import Optional, List
-from fastapi import FastAPI, Path, Query, HTTPException, Response, Body, Header
+from fastapi import FastAPI, Path, Query, HTTPException, Response, Body, Header, Depends, Request
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import IntegrityError
 
@@ -179,18 +179,22 @@ async def restore_student(student_id: int, body: RestoreRequest = Body(default=R
     logger.info("student.restore ok id%s", student_id)
     return Response(status_code=204)
 
-# Admin Hard delete
-def require_admin(x_admin_token: str | None = Header(default=None, alias="X-Admin-Token")) -> bool:
-    if TESTING:
-        return True
-    if x_admin_token and x_admin_token == ADMIN_TOKEN:
-        return True
-    raise HTTPException(status_code=403, detail="Admin token required")
 
-##Delete students function 
+def require_admin(request: Request) -> bool:
+    # tests set TESTING=1 and bypass auth
+    if os.getenv("TESTING") == "1":
+        return True
+    token = request.headers.get("X-Admin-Token")
+    if token != os.getenv("ADMIN_TOKEN", "dev-admin"):
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return True
+
+# Admin Hard delete
 @app.delete("/students/{student_id}", status_code=204)
-async def hard_delete_student_admin(student_id: int, _ok: bool = Depends(requre_admin)):
-    student = await Student.get_or
+async def hard_delete_student_admin(
+    student_id: int = Path(..., ge=1),
+    _ok: bool = Depends(require_admin),
+):
     student = await Student.get_or_none(id=student_id)
     if not student:
         logger.warning("student.delete not_found id=%s", student_id)
