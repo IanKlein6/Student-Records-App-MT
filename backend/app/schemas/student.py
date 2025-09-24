@@ -19,6 +19,8 @@ class StudentPatch(BaseModel):
     status: Optional[StudentStatus] = None 
     notes: Optional[Str255] = None
     group: Optional[int] = None
+    group_id: Optional[int] = None
+    semester_id: Optional[int] = None
     work_student_potential: Optional[WorkPotential] = None
 
 
