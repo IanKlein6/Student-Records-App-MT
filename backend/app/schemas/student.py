@@ -3,35 +3,31 @@ from app.models.student import Student, StudentStatus, WorkPotential
 from pydantic import BaseModel, EmailStr, StringConstraints, field_validator
 from datetime import datetime
 from typing import Annotated, Optional
+from app.schemas.types import Str50, Str255, NormalizedEmail
 
 class StudentCreate(BaseModel):
-    first_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
-    last_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
-    email: EmailStr
-    semester_id: int
+    first_name: Str50 
+    last_name: Str50
+    email: NormalizedEmail
+    semester_id: Optional[int] = None 
+    group_id: Optional[int] = None 
 
 class StudentPatch(BaseModel):
-    first_name: Optional[Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]] = None
-    last_name: Optional[Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]] = None
-    email: Optional[EmailStr] = None
+    first_name: Optional[Str50] = None
+    last_name: Optional[Str50] = None
+    email: Optional[NormalizedEmail] = None
     status: Optional[StudentStatus] = None 
-    notes: Optional[Annotated[str, StringConstraints(strip_whitespace=True, max_length=255)]] = None
+    notes: Optional[Str255] = None
     group: Optional[int] = None
     work_student_potential: Optional[WorkPotential] = None
-
-    #email normalizer 
-    @field_validator("email", mode="before")
-    @classmethod
-    def normalize_email(cls, v: Optional[str]) -> Optional[str]:
-        return v.strip().lower() if v else v
 
 
 # Add classes for different use cases in the future. e.i. if the front end only needs a list of names then create a schema where only names get pushed. also for security dont push things that dont need to be. 
 class StudentRead(BaseModel):
     id: int
-    first_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
-    last_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
-    email: EmailStr
+    first_name: Str50
+    last_name: Str50
+    email: NormalizedEmail
     semester_id: Optional[int]
     status: StudentStatus
     notes: Optional[str] = None 
@@ -46,9 +42,9 @@ class StudentRead(BaseModel):
 
 class StudentList(BaseModel):
     id: int
-    first_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
-    last_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
-    email: EmailStr
+    first_name: Str50
+    last_name: Str50
+    email: NormalizedEmail
 
 # Archive and Restore endpoint bodies
 class ArchiveRequest(BaseModel):
