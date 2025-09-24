@@ -2,7 +2,7 @@
 
 import logging, os
 from typing import Optional, List
-from fastapi import FastAPI, Path, Query, HTTPException, Response, Body
+from fastapi import FastAPI, Path, Query, HTTPException, Response, Body, Header
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import IntegrityError
 
@@ -13,6 +13,7 @@ from app.services.students import hard_delete_student
 
 #Testing potentially remove for production
 TESTING = os.getenv("TESTING") == "1" 
+ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "dev-admin") # production: set real value
 
 logging.basicConfig(
     level=logging.INFO, # change to DEBUG for debugging 
@@ -29,37 +30,29 @@ async def health():
 
 
 ##Create students 
-@app.post("/student", response_model=StudentRead, status_code=201)
+@app.post("/students", response_model=StudentRead, status_code=201)
 async def create_student(payload: StudentCreate, response: Response):     
     """Create a student. Returns 201 with the created resource.""" #OpenAPI/Swagger docs
     try:    
         student = await Student.create(
             first_name=payload.first_name,
             last_name=payload.last_name,
-            email = payload.email
+            email = payload.email,
+            semester_id = payload.semester_id,
+            group_id = payload.group_id,
         )
 
+    # Unique email collision
     except IntegrityError:
-        # Unique email collision
         raise HTTPException(status_code=409, detail="Email already exists")
 
-    response.headers["Location"] = f"/student/{student.id}"
-
-    logger.info(
-        "student.create",
-        extra={
-            "first_name": student.first_name,
-            "last_name": student.last_name,
-            "email": student.email,
-            "student_id": student.id,
-        },
-    )
-
+    response.headers["Location"] = f"/students/{student.id}"
+    logger.info("student.create ok id=%s email=%s", student.id, student.email)
     return StudentRead.model_validate(student, from_attributes=True)
 
 
 ##GET student by ID
-@app.get("/student/{student_id}", response_model=StudentRead)
+@app.get("/students/{student_id}", response_model=StudentRead)
 async def get_student_by_id(student_id: int = Path(..., ge=1)):
     student = await Student.get_or_none(id=student_id)
     if not student:
@@ -70,7 +63,7 @@ async def get_student_by_id(student_id: int = Path(..., ge=1)):
     return StudentRead.model_validate(student, from_attributes=True)
 
 ##Get student with List/Filters
-@app.get("/student", response_model=List[StudentList])
+@app.get("/students", response_model=List[StudentList])
 async def list_student(
     first_name: Optional[str] = Query(None),
     last_name: Optional[str] = Query(None),
@@ -101,7 +94,7 @@ async def list_student(
     
 
 ## Patch student
-@app.patch("/student/{student_id}", response_model=StudentRead)
+@app.patch("/students/{student_id}", response_model=StudentRead)
 async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
     logger.debug(
             "student.patch start id=%s payload=%s",
@@ -165,43 +158,45 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
 
 
 ## Archive endpoints
-@app.post("student/{student_id}/archive", status_code=204)
+@app.post("/students/{student_id}/archive", status_code=204)
 async def archive_student(student_id: int, body: ArchiveRequest = Body(default=ArchiveRequest())):
     student = await Student.get_or_none(id=student_id)
     if not student:
-        logger.error("student.archive/restore student id%s not found", student_id)
+        logger.error("student.archive not_found id%s", student_id)
         raise HTTPException(status_code=404, detail="Student not found")
     await student.archive(body.reason)
-    logger.info("student.archive/restore student id%s archived successfully", student_id)
+    logger.info("student.archive ok id%s", student_id)
     return Response(status_code=204)
 
-## Restore endpoints
-@app.post ("/student/{student_id}/restore", status_code=204)
+## Restore student from archive
+@app.post ("/students/{student_id}/restore", status_code=204)
 async def restore_student(student_id: int, body: RestoreRequest = Body(default=RestoreRequest())):
     student = await Student.get_or_none(id=student_id)
     if not student:
-        logger.error("student.restore student id%s not found", student_id)
+        logger.error("student.restore not_found id%s", student_id)
         raise HTTPException(status_code=404, detail="Student not found")
     await student.restore(body.reason)
-    logger.info("student.restore student id%s successfully restored")
+    logger.info("student.restore ok id%s", student_id)
     return Response(status_code=204)
 
-
+# Admin Hard delete
+def require_admin(x_admin_token: str | None = Header(default=None, alias="X-Admin-Token")) -> bool:
+    if TESTING:
+        return True
+    if x_admin_token and x_admin_token == ADMIN_TOKEN:
+        return True
+    raise HTTPException(status_code=403, detail="Admin token required")
 
 ##Delete students function 
-@app.delete("/student/{student_id}", status_code=204)
-async def delete_student_by_id(student_id: int = Path(..., ge=1)):
-    # Delete a student by primary key. Returns 204 on success, 404 if the student does not exist.
-    try: 
-        deleted = await Student.filter(id=student_id).delete()
-    except Exception as exc:
-        logger.error("student.delete unexpected_error id=%s error=%r", student_id, exc)
-        raise
-    if deleted == 0:
+@app.delete("/students/{student_id}", status_code=204)
+async def hard_delete_student_admin(student_id: int, _ok: bool = Depends(requre_admin)):
+    student = await Student.get_or
+    student = await Student.get_or_none(id=student_id)
+    if not student:
         logger.warning("student.delete not_found id=%s", student_id)
         raise HTTPException(status_code=404, detail="Student not found")
-    # 204 = no body
-    logger.info("student.delete success id=%s", student_id)
+    await hard_delete_student(student, reason="ADMIN hard delete")
+    logger.info("student.hard_delete ok id=%s", student_id)
     return Response(status_code=204)
 
 
@@ -210,11 +205,7 @@ if not TESTING:
     register_tortoise( 
         app, #app instance being connected. Core Object 
         db_url="postgres://postgres:postgres@localhost:5432/student_records",
-        modules={"models": [
-            "app.models.student",
-            "app.models.group",
-            "app.models.semester"
-            ]},
+        modules={"models": ["app.models.student", "app.models.group", "app.models.semester"]},
         generate_schemas=False,
         add_exception_handlers=True,
     )
