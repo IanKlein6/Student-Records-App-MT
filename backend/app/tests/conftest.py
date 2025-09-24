@@ -1,11 +1,15 @@
 #conftest.py
-import asyncio
-import pytest
+import pytest, asyncio, os
 from httpx import AsyncClient, ASGITransport #needed for fastapi testing
 from tortoise import Tortoise
 from tortoise.contrib.test import getDBConfig
 from app.models.student import Student
 from app.main import app  # Ensure this points to the FastAPI app
+
+@pytest.fixture(scope="session", autouse=True)
+def _testing_env():
+    os.environ["TESTING"] = "1"
+    yield
 
 # Points Tortoise to your models module. Add models as needed
 MODELS = {"models": [
