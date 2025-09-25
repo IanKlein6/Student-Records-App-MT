@@ -1,4 +1,4 @@
-# app/config.py
+# backend/app/config.py
 TORTOISE_ORM = {
     "connections": {
         # Either DSN string…
