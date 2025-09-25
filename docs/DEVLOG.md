@@ -269,3 +269,26 @@ Soft delete behavior (status changes to archived, not removed).
   - Fixed circular import by avoiding importing model symbols from the same module; collected related enums/classes in one module. Added missing FastAPI imports (Depends, Request) where needed.
 - Test suite pass
   - Fixed failing tests: archive status now returns archived after POST /students/{id}/archive; admin hard delete resolves to 204; general DELETE /students/{id} is gone (404/405).
+
+
+## 25-09-25
+Single FastAPI app in app/main.py
+-- Reduces confusion, avoids “two apps” bugs, aligns with test imports (from app.main import app).
+Admin scope under /admin/* with router-level auth
+-- Clear separation of concerns, least privilege, and simpler security. Tests bypass via TESTING=1.
+Public delete disabled for students
+-- Policy choice to prevent accidental data loss; public DELETE /students/{id} returns 404. Hard deletes are admin-only.
+Hard delete via service function + audit log
+-- Centralizes destructive logic and guarantees ArchiveLog(HARD_DELETE) is recorded before deletion.
+Students list: filters + sorting
+-- Backend supports semester_id, status (active|archived|failout), q (ILIKE first/last), and sorting (created_at default desc; optional name/email/created_at asc|desc). Combines safely and runs in DB for performance.
+Default ordering = “newest first”
+-- Uses created_at desc when available; falls back to id desc for stability without timestamps.
+Tests create FK rows they depend on
+-- When tests use semester_id, they first create Semester records to avoid FK IntegrityError.
+Error handling direction for POST /students
+-- Pre-check email for 409 “Email already exists”; treat other DB integrity failures (e.g., invalid FK) as 422 with a clearer message. This avoids mislabeling all IntegrityError as duplicate email.
+Code style for admin route naming
+-- Avoid shadowing service names; route is admin_hard_delete(), service is hard_delete_student_service() for clarity.
+Pending hygiene items
+-- Migrate deprecated APIs (UTC, db_index, Pydantic v2) to remove warnings before release.

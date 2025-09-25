@@ -163,3 +163,43 @@ Routing Conventions
     - Why: Easier to grep and ship to observability stacks; consistent event names across routes simplify alerting/dashboards.
 - Drop duplicate/typo’d routes and fix missing imports
     - Why: Avoid confusion in the router table and runtime errors (e.g., missing Request, Depends). Keeps the app startup clean and deterministic.
+
+## 25-09-25
+Router split & single app
+-- Consolidated to a single FastAPI instance in app/main.py; backend/main.py is now only a runner. Mounted app/routers/students.py (public) and app/routers/admin.py (privileged) to keep main.py slim and maintainable.
+Admin hard delete
+-- Implemented DELETE /admin/students/{id} guarded by router-level require_admin (bypassed when TESTING=1). Route calls hard_delete_student_service(student, reason="ADMIN hard delete") which writes an ArchiveLog(HARD_DELETE) and deletes the row.
+Public delete disabled (stub)
+-- Public DELETE /students/{id} removed. Added a stub that returns 404 for any id to prevent accidental deletions and satisfy tests expecting 404 on unknown ids.
+GET /students: filters + sorting
+-- Added combinable filters:
+semester_id (exact)
+status in {active, archived, failout} (failout → FAILED)
+q (ILIKE on first_name OR last_name)
+-- Sorting:
+Default: created_at desc (fallback id desc if no timestamp field)
+Optional: name:asc|desc (last_name, first_name), first_name:*, last_name:*, email:*, created_at:*
+-- Supports limit/offset for paging.
+Tests
+-- Added test_students_filter_sorting.py covering combined filters, sorting by name/email, and default newest-first order.
+-- Fixed test isolation by generating unique emails via short UUID.
+-- Created Semester rows in tests before using semester_id to avoid FK failures.
+-- Root endpoint adjusted to return {"message": "Hello World"}.
+-- Added/imported Path in admin router; avoided naming collisions by using hard_delete_student_service.
+Bug fixes & pitfalls found
+-- Avoided “two apps” issue (previously backend/main.py created a second app).
+-- Avoided double prefix (/admin/admin/...) by mounting prefix in exactly one place.
+-- Ensured DELETE /students/{id} returns 404 instead of 405 to match spec/tests.
+Warnings & cleanup (pending)
+-- Replace datetime.utcnow() → datetime.now(timezone.utc).
+-- Tortoise: index=True → db_index=True.
+-- Pydantic v2: move any class Config → model_config = ConfigDict(...).
+-- Improve POST /students error mapping: pre-check duplicate email (409) and surface FK errors as 422 (clearer than a generic 409).
+Tooling notes
+-- rg (ripgrep) is system-level (brew install ripgrep); use grep -RIn if unavailable.
+
+Next steps
+-- Add groups router (public CRUD minus delete) and admin hard delete under /admin/groups/{id}.
+-- Extend q to include email (optional).
+-- Add OpenAPI descriptions/examples for new params.
+-- Add integration tests for paging + sort stability; write negative tests for invalid status/sort values.
