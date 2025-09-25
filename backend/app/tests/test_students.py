@@ -1,6 +1,27 @@
 # app/tests/test_students.py
 import pytest
 
+
+# 200: GET existing
+@pytest.mark.asyncio
+async def test_get_student_200(async_client):
+    s = await _create(async_client, email="get200@test.com")
+    r = await async_client.get(f"/students/{s['id']}")
+    assert r.status_code == 200
+    data = r.json()
+    assert data["id"] == s["id"]
+    assert data["email"] == "get200@test.com"
+
+# 200: PATCH existing (update first_name)
+@pytest.mark.asyncio
+async def test_patch_student_200(async_client):
+    s = await _create(async_client, email="patch200@test.com")
+    r = await async_client.patch(f"/students/{s['id']}", json={"first_name": "New"})
+    assert r.status_code == 200
+    data = r.json()
+    assert data["id"] == s["id"]
+    assert data["first_name"] == "New"
+
 # 422: missing required fields
 @pytest.mark.asyncio
 async def test_create_student_422_missing(async_client):
@@ -33,6 +54,16 @@ async def test_delete_student_404(async_client):
     r = await async_client.delete("/students/999999")
     assert r.status_code == 404 
 
+@pytest.mark.asyncio
+async def test_create_student_422_invalid_semester(async_client):
+    r = await async_client.post("/students", json={
+        "first_name": "Fk",
+        "last_name": "Error",
+        "email": "fkerror@example.com",
+        "semester_id": 999999
+    })
+    assert r.status_code == 422
+
 # CREATE student
 @pytest.mark.asyncio
 async def test_create_student(async_client):
@@ -64,6 +95,14 @@ async def test_create_student_duplicate_email(async_client):
     r2 = await async_client.post("/students", json=payload)
     assert r2.status_code == 409
     assert r2.json()["detail"] == "Email already exists"
+
+@pytest.mark.asyncio
+async def test_patch_student_409_duplicate_email(async_client):
+    s1 = await _create(async_client, email="dup1@ex.com")
+    s2 = await _create(async_client, email="dup2@ex.com")
+    r = await async_client.patch(f"/students/{s2['id']}", json={"email": "dup1@ex.com"})
+    assert r.status_code == 409
+
 
 # Location check
 @pytest.mark.asyncio
