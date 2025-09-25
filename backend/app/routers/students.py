@@ -5,9 +5,7 @@ from fastapi import APIRouter, Path, Query, HTTPException, Response, Body
 from tortoise.exceptions import IntegrityError
 
 from app.models.student import Student, StudentStatus
-from app.schemas.student import (
-    StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest
-)
+from app.schemas.student import (StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/students", tags=["students"])
@@ -115,4 +113,6 @@ async def restore_student(student_id: int, body: RestoreRequest = Body(default=R
     await student.restore(body.reason)
     return Response(status_code=204)
 
-
+@router.api_route("/{student_id}", methods=["DELETE"], include_in_schema=False)
+async def delete_student_public(student_id: int = Path(..., ge=1)):
+    raise HTTPException(status_code=404, detail="Student not found")

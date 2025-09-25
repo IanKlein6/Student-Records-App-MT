@@ -1,8 +1,8 @@
 # backend/app/routers/admin.py
 import os
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, Path
 from app.models.student import Student
-from app.services.students import hard_delete_student
+from app.services.students import hard_delete_student_service
 
 async def require_admin(request: Request):
     # In tests, bypass auth with TESTING=1
@@ -23,5 +23,5 @@ async def hard_delete_student(student_id: int = Path (..., ge=1)):
     student = await Student.get_or_none(id=student_id)
     if not student: 
         raise HTTPException(status_code=404, detail="Student not found")
-    await hard_delete_student(student, reason="ADMIN hard delete")
+    await hard_delete_student_service(student, reason="ADMIN hard delete")
     return Response(status_code=204)

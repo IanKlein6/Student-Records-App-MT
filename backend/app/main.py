@@ -2,7 +2,8 @@
 import os
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
-from app.routers import students, admin
+from app.routers.students import router as students_router
+from app.routers.admin import router as admin_router
 
 TESTING = os.getenv("TESTING") == "1"
 
@@ -12,9 +13,9 @@ app = FastAPI(title="Student Records API")
 async def health():
     return {"message": "OK"}
 
-# Endpoints routers
-app.include_router(students.router) 
-app.include_router(admin.router)    
+# Endpoints routers1
+app.include_router(students_router) 
+app.include_router(admin_router)    
 
 if not TESTING:
     register_tortoise(

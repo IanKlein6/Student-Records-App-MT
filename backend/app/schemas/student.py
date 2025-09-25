@@ -1,6 +1,6 @@
 # app/schemas/student.py
 from app.models.student import Student, StudentStatus, WorkPotential
-from pydantic import BaseModel, EmailStr, StringConstraints, field_validator
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Annotated, Optional
 from app.schemas.types import Str50, Str255, NormalizedEmail
@@ -39,8 +39,7 @@ class StudentRead(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class StudentList(BaseModel):
     id: int

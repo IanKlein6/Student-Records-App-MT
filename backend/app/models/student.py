@@ -1,7 +1,7 @@
 # app/models/student.py
 
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 from tortoise import fields
 from tortoise.models import Model
 
@@ -33,7 +33,7 @@ class Student(Model):
 
     work_student_potential = fields.CharEnumField(WorkPotential, null=True)
     
-    archived_at = fields.DatetimeField(null=True, index=True)
+    archived_at = fields.DatetimeField(null=True, db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
 
@@ -53,7 +53,7 @@ class Student(Model):
     async def archive(self, reason: str | None = None) -> None:
         if self.archived_at:
             return
-        self.archived_at = datetime.utcnow()
+        self.archived_at = datetime.now(timezone.utc)
         self.status = StudentStatus.ARCHIVED
         await self.save()
         await ArchiveLog.create(student=self, action=ArchiveAction.ARCHIVE, reason=reason)
