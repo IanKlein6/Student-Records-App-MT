@@ -3,6 +3,7 @@ import logging
 from typing import Optional, List
 from fastapi import APIRouter, Path, Query, HTTPException, Response, Body
 from tortoise.exceptions import IntegrityError
+from tortoise.expressions import Q
 
 from app.models.student import Student, StudentStatus
 from app.schemas.student import (StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest)
@@ -34,22 +35,53 @@ async def get_student_by_id(student_id: int = Path(..., ge=1)):
     return StudentRead.model_validate(student, from_attributes=True)
 
 @router.get("", response_model=List[StudentList])
-async def list_student(
-    first_name: Optional[str] = Query(None),
-    last_name: Optional[str] = Query(None),
-    email: Optional[str] = Query(None),
+async def list_students(
+    semester_id: Optional[int] = Query(None, ge=1),
+    status: Optional[str] = Query(None, pattern="^(active|archived|failout)$"),
+    q: Optional[str] = Query(None, min_length=1),  # ILIKE on first/last name
+    sort: Optional[str] = Query(None, pattern="^(name|first_name|last_name|email|created_at):(asc|desc)$"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
     qs = Student.all()
-    if first_name:
-        qs = qs.filter(first_name__icontains=first_name)
-    if last_name:
-        qs = qs.filter(last_name__icontains=last_name)
-    if email:
-        qs = qs.filter(email__icontains=email)
-    rows = await qs.limit(limit).offset(offset)
+
+    # filters (combinable)
+    if semester_id is not None:
+        qs = qs.filter(semester_id=semester_id)
+
+    if status:
+        status_map = {
+            "active": StudentStatus.ACTIVE,
+            "archived": StudentStatus.ARCHIVED,
+            "failout": StudentStatus.FAILED,  # alias
+        }
+        qs = qs.filter(status=status_map[status])
+
+    if q:
+        qs = qs.filter(Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q))
+
+    # sorting
+    has_created = "created_at" in Student._meta.fields_map
+    if not sort:
+        order_fields = ["-created_at"] if has_created else ["-id"]  # default
+    else:
+        field, direction = sort.split(":")
+        desc = direction == "desc"
+
+        if field == "name":
+            order_fields = (["-last_name", "-first_name"] if desc
+                            else ["last_name", "first_name"])
+        elif field in ("first_name", "last_name", "email"):
+            order_fields = [f"-{field}" if desc else field]
+        elif field == "created_at":
+            key = "created_at" if has_created else "id"
+            order_fields = [f"-{key}" if desc else key]
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported sort field")
+
+    rows = await qs.order_by(*order_fields).limit(limit).offset(offset)
     return [StudentList.model_validate(r, from_attributes=True) for r in rows]
+
 
 @router.patch("/{student_id}", response_model=StudentRead)
 async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
