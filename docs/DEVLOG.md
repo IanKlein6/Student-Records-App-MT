@@ -242,8 +242,30 @@ Soft delete behavior (status changes to archived, not removed).
     - GET /student excludes archived unless include_archived=true.
     - DELETE defaults to soft; ?hard=1 performs hard delete with log.
 
-Suggested next steps
- Add tests for archive/restore/hard-delete flows (including idempotency).
- Expose ArchiveLog via an admin-only GET /student/{id}/archive-log.
- Enforce “archived students cannot be assigned to groups or scheduled” at the service layer.
- Plan cross-model side effects for archiving (e.g., cancel Calendar events) and move logic to a domain service when needed.
+-Suggested next steps
+  Add tests for archive/restore/hard-delete flows (including idempotency).
+  Expose ArchiveLog via an admin-only GET /student/{id}/archive-log.
+  Enforce “archived students cannot be assigned to groups or scheduled” at the service layer.
+  Plan cross-model side effects for archiving (e.g., cancel Calendar events) and move logic to a domain service when needed.
+
+## 24-09-25
+- Switch to plural REST paths
+  - Migrated endpoints from /student to /students for REST consistency (collections are plural). Updated tests accordingly and ensured Location header now returns /students/{id}.
+- Archive/restore model behavior fixed
+  - Implemented correct semantics in Student.archive() and Student.restore(): set/clear archived_at, flip status (archived/active), persist, and log ArchiveLog entries. Removed inverted/buggy checks.
+- Remove general hard delete; add admin-only hard delete
+  - Removed DELETE /students/{id} (to prevent accidental data loss). Added DELETE /admin/students/{id} that calls hard_delete_student(). Wires through a lightweight require_admin dependency (bypassed when TESTING=1).
+- HTTPX 0.28 testing update
+  - Rewrote conftest.py client fixture to use httpx.ASGITransport(app=app) instead of deprecated AsyncClient(app=...). Fixed lifespan arg mismatch by omitting it.
+- Test database bootstrapping
+  - conftest.py now initializes Tortoise against sqlite://:memory: and generates schemas per test, ensuring isolation and no leftover state.
+- Email normalization strategy
+  - Centralized email normalization via a reusable EmailNormalized type/validator in types.py. StudentCreate and StudentPatch use it to ensure lowercase/trimmed emails without re-declaring validators everywhere.
+- Integrity and uniqueness checks
+  - In POST /students and PATCH /students/{id}, catch IntegrityError and return 409 “Email already exists”. In PATCH, also short-circuit if empty body (400).
+- Logging cleanup
+  - Standardized log event names and fields (student.create, student.patch, etc.), removed duplicate decorators and stray routes; ensured warnings/errors on not found and conflicts.
+- Import/circular fixes
+  - Fixed circular import by avoiding importing model symbols from the same module; collected related enums/classes in one module. Added missing FastAPI imports (Depends, Request) where needed.
+- Test suite pass
+  - Fixed failing tests: archive status now returns archived after POST /students/{id}/archive; admin hard delete resolves to 204; general DELETE /students/{id} is gone (404/405).

@@ -144,3 +144,22 @@ Routing Conventions
         - Setting status=ARCHIVED → student.archive(...).
         - Changing status away from ARCHIVED → student.restore(...) first.
         - Rationale: Guarantees status ⇄ archived_at invariants and audit logging.
+## 24-09-25
+- Use plural resource paths (/students)
+    - Why: Conventional REST design uses plural for collections; improves clarity when mixing list vs. detail routes and aligns with common tooling/docs.
+- Keep soft delete as “archive” + separate “restore”
+    - Why: Business intent is to hide but retain records. Explicit archive/restore methods avoid ambiguity and enforce auditing through ArchiveLog.
+- Remove general DELETE; add admin-only hard delete at /admin/students/{id}
+    - Why: Prevent accidental destruction; reserve destructive ops for admins. Keeps the public surface safe while still supporting compliance/admin workflows.
+- Centralize email normalization in types.py
+    - Why: DRY. One reusable constrained/validated type prevents duplicating validators across schemas and ensures consistent lowercase/trim behavior everywhere.
+- Normalize + enforce email uniqueness at API boundaries
+    - Why: Catch duplicates predictably (409) and keep DB/email casing consistent, avoiding ghost duplicates due to case differences.
+- Update tests to httpx 0.28 ASGITransport
+    - Why: AsyncClient(app=...) was removed; ASGITransport is the supported approach. Keeps tests future-proof and stable.
+- Use in-memory SQLite for tests with per-test schema generation
+    - Why: Fast, isolated, no cross-test leakage. Simplifies CI and local runs.
+- Standardize logging keys and messages
+    - Why: Easier to grep and ship to observability stacks; consistent event names across routes simplify alerting/dashboards.
+- Drop duplicate/typo’d routes and fix missing imports
+    - Why: Avoid confusion in the router table and runtime errors (e.g., missing Request, Depends). Keeps the app startup clean and deterministic.
