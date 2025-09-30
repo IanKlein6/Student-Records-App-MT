@@ -8,6 +8,7 @@ TORTOISE_ORM = {
         "models": {
             "models": [
                 "app.models.student", 
+                "app.models.archive_log"
                 "aerich.models", 
             ], 
             "default_connection": "default",
