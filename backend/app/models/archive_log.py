@@ -17,5 +17,5 @@ class ArchiveLog(Model):
         on_delete=fields.SET_NULL,
     )
     action = fields.CharEnumField(ArchiveAction)
-    reason = fields.CharField(max_length=255, null=True)
+    reason = fields.CharField(max_length=250, null=True)
     created_at = fields.DatetimeField(auto_now_add=True)

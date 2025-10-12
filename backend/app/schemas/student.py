@@ -1,6 +1,7 @@
 # app/schemas/student.py
 from app.models.student import Student, StudentStatus, WorkPotential
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
+from pydantic.config import ConfigDict
 from datetime import datetime
 from typing import Annotated, Optional
 from app.schemas.types import Str50, Str255, NormalizedEmail
@@ -11,6 +12,7 @@ class StudentCreate(BaseModel):
     email: NormalizedEmail
     semester_id: Optional[int] = None 
     group_id: Optional[int] = None 
+    model_config = ConfigDict(extra="forbid")
 
 class StudentPatch(BaseModel):
     first_name: Optional[Str50] = None

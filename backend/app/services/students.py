@@ -9,6 +9,8 @@ from app.models.archive_log import ArchiveLog, ArchiveAction
 
 # Hard delete wrapper
 async def hard_delete_student_service(student_obj: Student, reason: str | None = None) -> None:
+    """Hard Delete wrapper takes a student object and a reason. 
+    Creates a archive log of the student then hard deletes the student."""
     # Log first so the entry survives even if FK on ArchiveLog is SET_NULL
     await ArchiveLog.create(student=student_obj, action=ArchiveAction.HARD_DELETE, reason=reason)
     await student_obj.delete()

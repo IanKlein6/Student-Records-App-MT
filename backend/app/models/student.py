@@ -4,6 +4,7 @@ from enum import Enum
 from datetime import datetime, timezone
 from tortoise import fields
 from tortoise.models import Model
+from app.models.archive_log import ArchiveAction, ArchiveLog
 
 # Options for student active status
 class StudentStatus(str, Enum):
@@ -65,15 +66,3 @@ class Student(Model):
         self.status = StudentStatus.ACTIVE
         await self.save()
         await ArchiveLog.create(student=self, action=ArchiveAction.RESTORE, reason=reason)
-
-class ArchiveAction(str, Enum):
-    ARCHIVE = "archive"
-    RESTORE= "restore"
-    HARD_DELETE = "hard_delete"
-
-class ArchiveLog(Model):
-    id = fields.IntField(primary_key=True)
-    student = fields.ForeignKeyField("models.Student", related_name="archive_logs", null=True, on_delete=fields.SET_NULL)
-    action = fields.CharEnumField(ArchiveAction)
-    timestamp = fields.DatetimeField(auto_now_add=True)
-    reason = fields.TextField(null=True)

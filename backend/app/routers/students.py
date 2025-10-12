@@ -6,25 +6,15 @@ from tortoise.exceptions import IntegrityError
 from tortoise.expressions import Q
 
 from app.models.student import Student, StudentStatus
-from app.schemas.student import (StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest)
-
+from app.schemas.student import StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest
+from app.services.students import create_student_service
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/students", tags=["students"])
 
 @router.post("", response_model=StudentRead, status_code=201)
 async def create_student(payload: StudentCreate, response: Response):
-    try:
-        student = await Student.create(
-            first_name=payload.first_name,
-            last_name=payload.last_name,
-            email=payload.email,
-            semester_id=payload.semester_id,
-            group_id=payload.group_id,
-        )
-    except IntegrityError:
-        raise HTTPException(status_code=409, detail="Email already exists")
+    student = await create_student_service(payload)        
     response.headers["Location"] = f"/students/{student.id}"
-    logger.info("student.create ok id=%s email=%s", student.id, student.email)
     return StudentRead.model_validate(student, from_attributes=True)
 
 @router.get("/{student_id}", response_model=StudentRead)
