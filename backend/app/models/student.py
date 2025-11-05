@@ -6,20 +6,50 @@ from tortoise import fields
 from tortoise.models import Model
 from app.models.archive_log import ArchiveAction, ArchiveLog
 
-# Options for student active status
+
 class StudentStatus(str, Enum):
+    """Student course status option."""
     ACTIVE = "active"
     PASSED = "passed"
     FAILED = "failed"
     ARCHIVED = "archived"
 
-# rating for student potential for workstudent
 class WorkPotential(str, Enum):
+    """Working student potential rating for recruitment purposes."""
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
 
 class Student(Model):
+    """Student profile model + archive/restore functionality.
+        
+        This model represents a student in the system with support for archiving and restoration, including audit logging of these actions.
+
+        Attributes:
+            id (int): Assigned Student ID.
+            first_name (charfield): First name.
+            last_name (charfield): Last name.
+            email (charfield): Unique email.
+            notes (text): Instructors notes about the student.
+            semester (foreignkey): Current semester, inherited from models.Semester.
+            group (foreignkey): Assigned project group, inherited from models.Group.
+            status (char enum): Students course status, defined in StudentStatus.
+            attempt_num (int): Number of oral exam attempts.
+            word_student_potential (char enum): Working student scouting potential. 
+            archived_at (date/time): When student was archived.
+            created_at (date/time): When student was create.
+            update_at (date/time): When student data has been last updated.
+
+        Functions:
+            is_archived(self): check if archived. 
+            __str__(self): Returns student name body.
+            archive(self, reason): Archiving logic. 
+            restore(self, reason): Restoring logic.
+
+        Meta: 
+            Adds indexes on (last_name, first_name) and on status.
+
+    """
     id = fields.IntField(primary_key=True)
     first_name = fields.CharField(max_length=50)
     last_name = fields.CharField(max_length=50)
@@ -37,21 +67,38 @@ class Student(Model):
     archived_at = fields.DatetimeField(null=True, db_index=True)
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
+    ## add restore date/time?
 
-    # Checks if student is archived or not
     @property # allows access like student.is_archived
-    def is_archived(self) -> bool:
+    def is_archived(self) -> bool: ## Is this redundant?? or error checking. can check student archived_at field to check??
+        """Checks if student is archived, returns is not None."""
         return self.archived_at is not None # = True if archived_at has a value
     
-    # Return request
     def __str__(self):
+        """Returns request body, first and last name."""
         return f"{self.first_name} {self.last_name}"
 
     class Meta:
+        """Indexes by name and status."""
         indexes = [("last_name", "first_name"), ("status",),]
 
-    # Invariant enforcing helpers for logging the archiving/restoring of students. centralized 
     async def archive(self, reason: str | None = None) -> None:
+        """Archive student and record action.
+
+        This method marks the student as archived and logs the action.
+        It is idempotent—calling it multiple times will not create duplicate logs and it will exit early
+
+        Process: 
+            - check if student is already archived; If True, exits early.
+            - Set 'archived_at' to current datetime.
+            - Update 'status' to 'ARCHIVED'.
+            - Save the updated student record.
+            - Create an ArchiveLog entry.
+
+        Notes:
+            Async = call with await student.archive(...).
+            Reason = optional explanation for students archiving.
+        """
         if self.archived_at:
             return
         self.archived_at = datetime.now(timezone.utc)
@@ -60,9 +107,24 @@ class Student(Model):
         await ArchiveLog.create(student=self, action=ArchiveAction.ARCHIVE, reason=reason)
 
     async def restore(self, reason: str | None = None) -> None:
+        """Restore the student from Archived and record action
+        
+        Reverts an archived student back and writes a corresponding ArchiveLog. 
+        It is idempotent, it will exit early if the student is not archived. 
+
+        Process: 
+            - Check if student is not archived, if True exit. 
+            - Set status to 'ACTIVE'.
+            - Clear 'archived_at'.
+            - Saves updated record.
+            - Create ArchiveLog entry with 'RESTORE' as the action
+                    
+        Notes:
+            This is an async method and must be awaited. Call with await student.restore(...).
+        """
         if not self.archived_at:
             return
-        self.archived_at = None
         self.status = StudentStatus.ACTIVE
+        self.archived_at = None 
         await self.save()
         await ArchiveLog.create(student=self, action=ArchiveAction.RESTORE, reason=reason)

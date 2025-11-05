@@ -24,7 +24,8 @@ class StudentPatch(BaseModel):
     group_id: Optional[int] = None
     semester_id: Optional[int] = None
     work_student_potential: Optional[WorkPotential] = None
-
+ 
+ 
 
 # Add classes for different use cases in the future. e.i. if the front end only needs a list of names then create a schema where only names get pushed. also for security dont push things that dont need to be. 
 class StudentRead(BaseModel):
