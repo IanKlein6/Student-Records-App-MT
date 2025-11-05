@@ -8,11 +8,17 @@ from tortoise.expressions import Q
 from app.models.student import Student, StudentStatus
 from app.schemas.student import StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest
 from app.services.students import create_student_service
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/students", tags=["students"])
 
 @router.post("", response_model=StudentRead, status_code=201)
 async def create_student(payload: StudentCreate, response: Response):
+    """Create student service.
+    
+        Process: 
+            - 
+    """
     student = await create_student_service(payload)        
     response.headers["Location"] = f"/students/{student.id}"
     return StudentRead.model_validate(student, from_attributes=True)
