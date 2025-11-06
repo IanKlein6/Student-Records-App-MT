@@ -23,7 +23,7 @@ class WorkPotential(str, Enum):
 class Student(Model):
     """Student profile model + archive/restore functionality.
         
-        This model represents a student in the system with support for archiving and restoration, including audit logging of these actions.
+    This model represents a student in the system with support for archiving and restoration, including audit logging of these actions.
 
         Attributes:
             id (int): Assigned Student ID.
@@ -48,7 +48,6 @@ class Student(Model):
 
         Meta: 
             Adds indexes on (last_name, first_name) and on status.
-
     """
     id = fields.IntField(primary_key=True)
     first_name = fields.CharField(max_length=50)
@@ -112,15 +111,15 @@ class Student(Model):
         Reverts an archived student back and writes a corresponding ArchiveLog. 
         It is idempotent, it will exit early if the student is not archived. 
 
-        Process: 
-            - Check if student is not archived, if True exit. 
-            - Set status to 'ACTIVE'.
-            - Clear 'archived_at'.
-            - Saves updated record.
-            - Create ArchiveLog entry with 'RESTORE' as the action
-                    
-        Notes:
-            This is an async method and must be awaited. Call with await student.restore(...).
+            Process: 
+                - Check if student is not archived, if True exit. 
+                - Set status to 'ACTIVE'.
+                - Clear 'archived_at'.
+                - Saves updated record.
+                - Create ArchiveLog entry with 'RESTORE' as the action
+                        
+            Notes:
+                This is an async method and must be awaited. Call with await student.restore(...).
         """
         if not self.archived_at:
             return
