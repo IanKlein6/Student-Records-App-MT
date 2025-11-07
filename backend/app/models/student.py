@@ -49,7 +49,7 @@ class Student(Model):
         Meta: 
             Adds indexes on (last_name, first_name) and on status.
     """
-    id = fields.IntField(primary_key=True)
+    id = fields.IntField(primary_key=True) ## change variables to id_student etc to be more descriptive 
     first_name = fields.CharField(max_length=50)
     last_name = fields.CharField(max_length=50)
     email = fields.CharField(max_length=100, unique=True)

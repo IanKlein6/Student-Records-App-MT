@@ -64,22 +64,27 @@ class StudentPatch(BaseModel):
 
 # Add classes for different use cases in the future. e.i. if the front end only needs a list of names then create a schema where only names get pushed. also for security dont push things that dont need to be. 
 class StudentRead(BaseModel):
-    """Schema that allows the retreaval of student data from the data base.
+    """Schema for retrieving a students information.
+
+    Used to retrieve all students information from the database. 
     
-    Attributes:
-        id: 
-        first_name: 
-        last_name:
-        email: 
-        semester_id: 
-        status: 
-        notes: 
-        work_student_potential:
-        group_id: 
-        attempt_num: 
-        created_at: 
-        updated_at:
-        model_config
+        Attributes:
+            id (int): Students database id number. 
+            first_name (str): Student's first name (max 50 chars).
+            last_name (str): Students's last name (max 50 chars).
+            email (str): Student's email (automatically normalized).
+            status (charenum): Student's current course status (active, passed, failed, archived).
+            notes (text): Instructor's notes about the Students progress (max 255 chars).
+            group_id (int): ID of the project group the student is in.
+            semester_id (int): ID of the semester the student is currently in.
+            work_student_potential (charenum): Recruitment potential rating (low, medium, high).
+            attempt_num (int): Students number of attempts for the exam (max of 3) ## check if 3 is correct!
+            created_at (date/time): Exact time student profile was created.
+            updated_at (date/time): Exact time student profile was last updated.
+            
+            Configuration:
+                All fields default to None. The API will only update fields that are explicitly provided in the request, leaving all others unchanged.
+                model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
     """
     id: int
     first_name: Str50
@@ -96,14 +101,24 @@ class StudentRead(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-class StudentList(BaseModel):
-    """Schema for frontend listing of students.
+class StudentList(BaseModel): ## This might be obsolete if its possible to use StudentRead and only retrieve a few specific parts without having to retrieve all the students data. 
+    """Schema for retrieval of multiple students for a list.
+
+        A Schema that defines the GET of student data from the data base for the purpose of displaying the students in a list. 
+        Is supposed to retrieve all students with only some of their most basic information to display in the frontend list which should then be able to sort the students by filters.
+    
+    Reasoning: Retrieve all students at once in order to speed up filtering process since they would all be "pre-loaded" in the list and wouldn't have to be re-retrieved at the point of filtering.
+        This is intended to increase filtering speed and reduced student information to minium is intended to increase retrieval speed. 
+    
     
     Attributes:
-        id: 
-        first_name: 
-        last_name: 
-        email: 
+        id (int): Students database id number. 
+        first_name (str): Student's first name (max 50 chars).
+        last_name (str): Students's last name (max 50 chars).
+        email (str): Student's email (automatically normalized).
+
+    Configuration:
+            model_config = ConfigDict(from_attributes=True), ensures clean ORM to JSON conversions so Tortoise models can be serialized safely. 
     """
     id: int
     first_name: Str50
