@@ -1,4 +1,27 @@
-# app/schemas/student.py
+# app/schemas/schema_student.py
+
+"""Overview Doc: Pydantic Schema for Students 
+
+Defines the way in which student related data is validated, serialized, and exchanged through the API. They form the boundary between the database models and external clients (frontend, 3rd party integrations, etc.
+
+Classes: 
+    StudentCreate: Basic schema for creating a new student (POST /students).
+    StudentPatch: Schema for changing/updating students data (PATCH /students{id}).
+    StudentRead: Schema for retrieving all data from a student (GET /students{id}).
+    StudentList: Schema for retrieving only selected data (id, first and last name, email) from a student for the use case of listing students without needing all of their data. 
+
+    ArchiveRequest: End point for archive a student.
+    RestoreRequest: End point for restoring a student if they are archived.
+
+Notes:
+    - All create and patch schemas use extra="forbid" field for stricter validation.
+    - Response schemas (Read/List) use from_attributes=True for ORM compatibility.
+    - This file complements app/models/model_student.py, which defines the database layer.
+
+Info Data Pipeline:
+    FastAPI endpoint <--> Pydantic schema <--> Tortoise model.
+"""
+
 from app.models.student import Student, StudentStatus, WorkPotential
 from pydantic import BaseModel
 from pydantic.config import ConfigDict
@@ -26,6 +49,7 @@ class StudentCreate(BaseModel):
     email: NormalizedEmail
     semester_id: Optional[int] = None 
     group_id: Optional[int] = None 
+
     model_config = ConfigDict(extra="forbid")
 
 class StudentPatch(BaseModel):
@@ -59,7 +83,6 @@ class StudentPatch(BaseModel):
     work_student_potential: Optional[WorkPotential] = None
 
     model_config = ConfigDict(extra="forbid")
- 
 
 class StudentRead(BaseModel):
     """Schema for retrieving a students information.

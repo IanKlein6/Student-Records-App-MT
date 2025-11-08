@@ -6,7 +6,7 @@ from tortoise.exceptions import IntegrityError
 from tortoise.expressions import Q
 
 from app.models.student import Student, StudentStatus
-from app.schemas.student import StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest
+from backend.app.schemas.schema_student import StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest
 from app.services.students import create_student_service
 
 logger = logging.getLogger(__name__)
