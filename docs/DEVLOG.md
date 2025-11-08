@@ -292,3 +292,34 @@ Code style for admin route naming
 -- Avoid shadowing service names; route is admin_hard_delete(), service is hard_delete_student_service() for clarity.
 Pending hygiene items
 -- Migrate deprecated APIs (UTC, db_index, Pydantic v2) to remove warnings before release.
+
+## 05 to 08 -11-25
+- Added PEP 257 docstrings for review standardization
+  - Started reviewing all Student model, service layer, schema, and router  to add docstrings for PEP 257 compliance and readability 
+  - Standardized format: imperative mood for summaries, proper Args/Returns/Raises sections
+  - Added "Configuration" sections to Pydantic schemas documenting model_config settings (extra="forbid")
+  - Clarified process documentation in service layer functions while maintaining PEP 257 structure
+  - Updated endpoint docstrings to focus on business logic rather than HTTP mechanics (status codes, schemas already visible in decorators)
+
+- Foreign key validation strategy clarified
+  - Documented reasoning for pre-validating semester_id in create_student_service: provides clear 422 errors before database operations
+  - Confirmed email uniqueness is validated by database constraints (caught via IntegrityError), not pre-checked to avoid race conditions
+  - Explained optional semester_id handling: validation only runs when semester_id is explicitly provided
+
+- Service layer error handling architecture
+  - Confirmed service layer raises HTTPException for business errors (422 for invalid FK, 409 for duplicates)
+  - Documented IntegrityError mapping: sqlstate codes (23505=unique, 23503=FK) translate to appropriate HTTP exceptions
+  - Bare `raise` at end of exception handler preserves unknown IntegrityErrors for debugging
+  - Established that routers stay thin - no try/except needed as FastAPI handles HTTPException automatically
+
+- Pydantic schema configuration standardized
+  - Added model_config = ConfigDict(extra="forbid") to StudentPatch to match StudentCreate
+  - Documented rationale: catches typos in update requests, prevents silent field ignoring
+  - Established pattern: input schemas (Create/Patch) use extra="forbid", output schemas (Read/List) use from_attributes=True
+  - Removed duplicate `group` field from StudentPatch, keeping only `group_id`
+
+- API security fundamentals documented
+  - Reviewed 12 core security concepts: authentication (JWT), authorization (RBAC), input validation, SQL injection prevention, rate limiting, HTTPS/TLS, environment variables, CORS, password hashing, logging/monitoring, error handling, dependency security
+  - Current protections identified: Tortoise ORM prevents SQL injection, Pydantic validates input, extra="forbid" catches malicious fields
+  - Security gaps identified: no authentication, no authorization, no rate limiting, need HTTPS in production
+  - Created security checklist prioritizing authentication, HTTPS, secrets management, rate limiting, and CORS configuration

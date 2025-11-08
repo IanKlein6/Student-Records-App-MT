@@ -203,3 +203,34 @@ Next steps
 -- Extend q to include email (optional).
 -- Add OpenAPI descriptions/examples for new params.
 -- Add integration tests for paging + sort stability; write negative tests for invalid status/sort values.
+
+## 05 to 08 -11-25
+- Adopt PEP 257 docstrings with team-friendly extensions
+  - Why: PEP 257 provides standard docstring structure, but team preference for detailed explanations led to keeping "Process" sections in service layer functions and "Configuration" sections in schemas. Balances standards compliance with team clarity needs.
+
+- Document errors in endpoint docstrings even though they originate in service layer
+  - Why: Endpoints are the public API interface that consumers interact with. Documenting errors (422, 409, etc.) in the endpoint helps API users understand error responses without digging into service code. Acts as documentation for the entire operation.
+
+- Pre-validate foreign keys before database operations
+  - Why: Provides clear, semantic HTTP errors (422 "Invalid semester_id") rather than cryptic database errors (23503). Fails fast with meaningful messages. semester_id validation only runs when provided (respects optional nature).
+
+- Validate email uniqueness via database constraints, not pre-checks
+  - Why: Prevents race conditions. Pre-checking email existence then creating student creates window where another request could create same email between check and insert. Database UNIQUE constraint is atomic and authoritative.
+
+- Keep routers thin - no try/except for HTTPException
+  - Why: FastAPI automatically catches and formats HTTPException responses. Adding try/except in routers creates boilerplate and violates single responsibility. Service layer handles business logic and raises exceptions; routers just pass through.
+
+- Service layer raises HTTPException for business errors
+  - Why: Allows precise control over HTTP status codes and error messages. IntegrityError mapping (sqlstate 23505→409, 23503→422) translates database constraints into semantic REST errors. Unknown errors re-raised for debugging.
+
+- Add model_config to all input schemas (Create/Patch)
+  - Why: extra="forbid" catches typos and malicious fields in API requests, providing immediate feedback. Prevents silent field ignoring that leads to user confusion. Output schemas (Read/List) use from_attributes=True for ORM conversion instead.
+
+- Never log sensitive data; use structured log messages
+  - Why: Security requirement - passwords, tokens, API keys must never appear in logs. Structured messages with consistent event names (student.create, student.patch) enable grep/alerting. Include context (user ID, IP) but not secrets.
+
+- Security implementation prioritization
+  - Why: Current API has no authentication/authorization - anyone can create/delete students. Priority order: 1) JWT authentication, 2) HTTPS in production, 3) environment variables for secrets, 4) rate limiting, 5) CORS configuration. Protects against most common attacks while maintaining development velocity.
+
+- Comprehensive error documentation in code
+  - Why: Future maintainers need to understand error flow. Documented which layer handles which errors (Pydantic→422 schema, Service→business rules, Database→integrity). Comments explain sqlstate codes, bare raise rationale, race condition scenarios.
