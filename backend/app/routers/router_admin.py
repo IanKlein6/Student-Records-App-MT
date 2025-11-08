@@ -1,4 +1,4 @@
-# backend/app/routers/admin.py
+# backend/app/routers/router_admin.py
 import os
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, Path
 from app.models.student import Student

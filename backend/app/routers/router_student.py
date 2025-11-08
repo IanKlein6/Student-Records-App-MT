@@ -1,4 +1,22 @@
-# backend/app/routers/router_students.py
+# backend/app/routers/router_student.py
+
+"""FastAPI router for students.
+
+Routers: 
+    create_student (POST): 
+    get_student_by_id (GET):
+    list_students (GET):
+    patch_student (PATCH):
+    archive_student (POST):
+    restore_student (POST):
+    delete_student_public (api_route):
+
+Notes: 
+
+Info data pipeline:
+    Frontend <--> FastApi router <--> Pydantic Schema. 
+"""
+
 import logging
 from typing import Optional, List
 from fastapi import APIRouter, Path, Query, HTTPException, Response, Body
@@ -10,14 +28,33 @@ from backend.app.schemas.schema_student import StudentCreate, StudentPatch, Stud
 from app.services.students import create_student_service
 
 logger = logging.getLogger(__name__)
+
+# API router variable
 router = APIRouter(prefix="/students", tags=["students"])
 
+## add global error handlers at a later point in time when needed to keep routers thin and keep error handlers centralized. 
 @router.post("", response_model=StudentRead, status_code=201)
 async def create_student(payload: StudentCreate, response: Response):
-    """Create student service.
+    """Create a new student API.
+
+    Handles POST requests from the frontend, validates the payload against the StudentCreate schema, and stores the new student in the database. Returns the created record serialized with the StudentRead schema.
+
+    Args:
+        payload: Validated student creation data.
+        response: FastAPI response object for setting headers.
     
-        Process: 
-            - 
+    Returns:
+        The newly created student record.
+
+    Raises: 
+        HTTPException: 422 if semester_id is invalid.
+        HTTPException: 409 if email already exists.
+
+    Process: 
+        - Accepts the validated request body (payload).
+        - Pass the payload to the service layer (create_student_service) for creation.
+        - Set a Location header pointing to the new resource (/students/{id}).
+        - Return the created student serialized as StudentRead with status code 201.
     """
     student = await create_student_service(payload)        
     response.headers["Location"] = f"/students/{student.id}"
@@ -25,6 +62,16 @@ async def create_student(payload: StudentCreate, response: Response):
 
 @router.get("/{student_id}", response_model=StudentRead)
 async def get_student_by_id(student_id: int = Path(..., ge=1)):
+    """Retrieves student by ID API.
+    
+    Handles GET requests of students from the frontend. 
+    
+    Process:
+        - Gets GET request with wanted student ID.
+        - Awaits till student is found.
+        - If not found raises 404 error.
+        - If it does find the student it pass the payload student to the frontend. 
+    """
     student = await Student.get_or_none(id=student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -39,8 +86,13 @@ async def list_students(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
-    qs = Student.all()
+    """Retrieves student by ID and list API
+    
 
+    Process:
+        - 
+    """
+    qs = Student.all()
     # filters (combinable)
     if semester_id is not None:
         qs = qs.filter(semester_id=semester_id)

@@ -24,10 +24,10 @@ async def create_student_service(data) -> Student:
     """Creates a new student record.
 
     Validates foreign key references before creation and maps database integrity errors to appropriate HTTP exceptions for API clients. 
-
-    Args: 
-        data: Student creation data containing first_name, last_name, email, and optional semester_id. 
-
+    
+    Args:
+        Data = Student creation data containing first_name, last_name, email, and optional semester_id. 
+        
     Returns:
         The newly created Student instance. 
 

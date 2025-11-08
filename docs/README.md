@@ -24,3 +24,23 @@ This folder contains supporting files used during the development process. It in
 ---
 
 > 🛠️ These files are **not part of the deployed app**. They exist to support structured, well-documented development.
+
+
+
+Status code cheat sheet (your app)
+  422 – Pydantic validation failed (auto by FastAPI).
+  400 – Syntactically valid but semantically wrong input (rare if you use 422 well).
+  401/403 – Auth/permissions.
+  404 – Student/Group/Semester not found.
+  409 – Unique constraint conflict (e.g., email).
+  500 – Unexpected server error (log it once, return generic message).
+Logging
+  Log once per request (e.g., in middleware or global handlers).
+  Include route, user (if known), request ID, and exception type.
+  Never log secrets or full payloads blindly.
+Bottom line:
+  Frontend: user-friendly checks & messages.
+  Pydantic: structure/validate data.
+  Service: business rules, transactions, domain exceptions.
+  Router/global handlers: translate to clean HTTP responses.
+  DB: final guardrails.
