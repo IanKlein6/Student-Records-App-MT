@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from pydantic.config import ConfigDict
 from datetime import datetime
 from typing import Annotated, Optional
-from app.schemas.types import Str50, Str255, NormalizedEmail
+from backend.app.utilities.utils import Str50, Str255, NormalizedEmail
 
 class StudentCreate(BaseModel):
     """Schema for creating a new Student.
@@ -53,16 +53,14 @@ class StudentPatch(BaseModel):
     email: Optional[NormalizedEmail] = None
     status: Optional[StudentStatus] = None 
     notes: Optional[Str255] = None
-    group: Optional[int] = None ## why do we need this? 
+    group: Optional[int] = None ## Do we need this considering we already have group_id? debate reasoning and check back into relationships 
     group_id: Optional[int] = None
     semester_id: Optional[int] = None
     work_student_potential: Optional[WorkPotential] = None
 
     model_config = ConfigDict(extra="forbid")
  
- 
 
-# Add classes for different use cases in the future. e.i. if the front end only needs a list of names then create a schema where only names get pushed. also for security dont push things that dont need to be. 
 class StudentRead(BaseModel):
     """Schema for retrieving a students information.
 
@@ -105,7 +103,7 @@ class StudentList(BaseModel): ## This might be obsolete if its possible to use S
     """Schema for retrieval of multiple students for a list.
 
         A Schema that defines the GET of student data from the data base for the purpose of displaying the students in a list. 
-        Is supposed to retrieve all students with only some of their most basic information to display in the frontend list which should then be able to sort the students by filters.
+        Is supposed to retrieve all students with only some of their most basic information to display in the frontend list which should then be able to sort the students by filters. Abstraction is the idea behind this.
     
     Reasoning: Retrieve all students at once in order to speed up filtering process since they would all be "pre-loaded" in the list and wouldn't have to be re-retrieved at the point of filtering.
         This is intended to increase filtering speed and reduced student information to minium is intended to increase retrieval speed. 
@@ -136,3 +134,4 @@ class RestoreRequest(BaseModel):
     """Endpoint for restoring student from archive with optional reason body."""
     reason: Optional[str] = None
 
+## Add classes for different use cases in the future. e.i. if the front end only needs a list of names then create a schema where only names get pushed. also for security dont push things that dont need to be. 
