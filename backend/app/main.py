@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from backend.app.routers.router_student import router as students_router
-from app.routers.admin import router as admin_router
+from backend.app.routers.router_admin import router as admin_router
 
 TESTING = os.getenv("TESTING") == "1"
 
