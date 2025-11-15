@@ -125,13 +125,12 @@ class StudentRead(BaseModel):
 class StudentList(BaseModel): ## This might be obsolete if its possible to use StudentRead and only retrieve a few specific parts without having to retrieve all the students data. 
     """Schema for retrieval of multiple students for a list.
 
-        A Schema that defines the GET of student data from the data base for the purpose of displaying the students in a list. 
-        Is supposed to retrieve all students with only some of their most basic information to display in the frontend list which should then be able to sort the students by filters. Abstraction is the idea behind this.
+    A Schema that defines the GET of student data from the data base for the purpose of displaying the students in a list. Is supposed to retrieve all students with only some of their most basic information to display in the frontend list which should then be able to sort the students by filters. Abstraction is the idea behind this.
     
-    Reasoning: Retrieve all students at once in order to speed up filtering process since they would all be "pre-loaded" in the list and wouldn't have to be re-retrieved at the point of filtering.
-        This is intended to increase filtering speed and reduced student information to minium is intended to increase retrieval speed. 
-    
-    
+    Reasoning: 
+        - Retrieve all students at once in order to speed up filtering process since they would all be "pre-loaded" in the list and wouldn't have to be re-retrieved at the point of filtering.
+        - This is intended to increase filtering speed and reduced student information to minium is intended to increase retrieval speed. 
+        
     Attributes:
         id (int): Students database id number. 
         first_name (str): Student's first name (max 50 chars).
