@@ -25,7 +25,7 @@ from tortoise.expressions import Q
 
 from backend.app.models.model_student import Student, StudentStatus
 from backend.app.schemas.schema_student import StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest
-from app.services.students import create_student_service
+from backend.app.services.service_student import create_student_service
 
 logger = logging.getLogger(__name__)
 
