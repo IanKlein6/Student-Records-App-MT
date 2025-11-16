@@ -2,6 +2,8 @@
  
 """Student FastAPI router.
 
+Routes in and out going requests for student data. 
+
 Routers: 
     create_student (POST): 
     get_student_by_id (GET):
