@@ -2,15 +2,15 @@
 
 """FastApi application factory and configs.
 
-Creates and configures the FastAPI application instance with:
+Creates and configures the FastAPI application instance with
     - Health check endpoint
     - Router registration for all API endpoints
     - Tortoise ORM integration (for non-test environments)
 
-Environment Variables:
+Environment Variables
     TESTING: Set to "1" to skip database registration (for pytest-ing)
 
-Database Models:
+Database Models
     When adding new models, register them in the Tortoise modules list to ensure proper schema generation and relationship handling.
 """
 

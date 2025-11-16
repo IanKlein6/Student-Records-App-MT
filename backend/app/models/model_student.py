@@ -4,12 +4,12 @@
 
 Tortoise model for defining students information in the database.
 
-Classes:
+Classes
     StudentStatus: Abstraction classes for status options.
     WorkPotential: Abstraction classes for student potential rating.
     Student(Model): Model for all of a students information.
 
-Info data pipeline:
+Info data pipeline
     Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database. 
 """
 
@@ -38,29 +38,29 @@ class Student(Model):
         
     This model represents a student in the system with support for archiving and restoration, including audit logging of these actions.
 
-        Attributes:
-            id (int): Assigned Student ID.
-            first_name (charfield): First name.
-            last_name (charfield): Last name.
-            email (charfield): Unique email.
-            notes (text): Instructors notes about the student.
-            semester (foreignkey): Current semester, inherited from models.Semester.
-            group (foreignkey): Assigned project group, inherited from models.Group.
-            status (char enum): Students course status, defined in StudentStatus.
-            attempt_num (int): Number of oral exam attempts.
-            word_student_potential (char enum): Working student scouting potential. 
-            archived_at (date/time): When student was archived.
-            created_at (date/time): When student was create.
-            update_at (date/time): When student data has been last updated.
+    #### Attributes
+        id (int): Assigned Student ID.
+        first_name (charfield): First name.
+        last_name (charfield): Last name.
+        email (charfield): Unique email.
+        notes (text): Instructors notes about the student.
+        semester (foreignkey): Current semester, inherited from models.Semester.
+        group (foreignkey): Assigned project group, inherited from models.Group.
+        status (char enum): Students course status, defined in StudentStatus.
+        attempt_num (int): Number of oral exam attempts.
+        word_student_potential (char enum): Working student scouting potential. 
+        archived_at (date/time): When student was archived.
+        created_at (date/time): When student was create.
+        update_at (date/time): When student data has been last updated.
 
-        Functions:
-            is_archived(self): check if archived. 
-            __str__(self): Returns student name body.
-            archive(self, reason): Archiving logic. 
-            restore(self, reason): Restoring logic.
+    #### Functions
+        is_archived(self): check if archived. 
+        __str__(self): Returns student name body.
+        archive(self, reason): Archiving logic. 
+        restore(self, reason): Restoring logic.
 
-        Meta: 
-            Adds indexes on (last_name, first_name) and on status.
+    #### Meta
+        Adds indexes on (last_name, first_name) and on status.
     """
     id = fields.IntField(primary_key=True) ## change variables to id_student etc to be more descriptive 
     first_name = fields.CharField(max_length=50)
@@ -124,15 +124,15 @@ class Student(Model):
         Reverts an archived student back and writes a corresponding ArchiveLog. 
         It is idempotent, it will exit early if the student is not archived. 
 
-            Process: 
-                - Check if student is not archived, if True exit. 
-                - Set status to 'ACTIVE'.
-                - Clear 'archived_at'.
-                - Saves updated record.
-                - Create ArchiveLog entry with 'RESTORE' as the action
-                        
-            Notes:
-                This is an async method and must be awaited. Call with await student.restore(...).
+        #### Process 
+            - Check if student is not archived, if True exit. 
+            - Set status to 'ACTIVE'.
+            - Clear 'archived_at'.
+            - Saves updated record.
+            - Create ArchiveLog entry with 'RESTORE' as the action
+                    
+        #### Notes
+            This is an async method and must be awaited. Call with await student.restore(...).
         """
         if not self.archived_at:
             return

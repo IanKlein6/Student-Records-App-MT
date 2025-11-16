@@ -4,7 +4,7 @@
 
 Routes in and out going requests for student data. 
 
-Routers: 
+Routers
     create_student (POST): 
     get_student_by_id (GET):
     list_students (GET):
@@ -13,9 +13,9 @@ Routers:
     restore_student (POST):
     delete_student_public (api_route): Disabled
 
-Notes: 
+Notes
 
-Info data pipeline:
+Info data pipeline
     Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database. 
 """
 
@@ -41,18 +41,18 @@ async def create_student(payload: StudentCreate, response: Response):
 
     Handles POST requests from the frontend, validates the payload against the StudentCreate schema, and stores the new student in the database. Returns the created record serialized with the StudentRead schema.
 
-    Args:
+    #### Args
         payload: Validated student creation data.
         response: FastAPI response object for setting headers.
     
-    Returns:
+    #### Returns
         The newly created student record.
 
-    Raises: 
+    #### Raises 
         HTTPException: 422 if semester_id is invalid.
         HTTPException: 409 if email already exists.
 
-    Process: 
+    #### Process 
         - Accepts the validated request body (payload).
         - Pass the payload to the service layer (create_student_service) for creation.
         - Set a Location header pointing to the new resource (/students/{id}).
@@ -68,7 +68,7 @@ async def get_student_by_id(student_id: int = Path(..., ge=1)):
     
     Handles GET requests of students from the frontend. 
     
-    Process:
+    #### Process
         - Gets GET request with wanted student ID.
         - Awaits till student is found.
         - If not found raises 404 error.
@@ -90,7 +90,7 @@ async def list_students(
 ):
     """Retrieve a filtered and sorted list of students.
 
-    Args: 
+    #### Args 
         semester_id: Filter by semester ID.
         status: Filter by status - 'active', 'archive', or 'failout'.
         q: Search term for first name, last name, or email (case-insensitive partial match).
@@ -98,13 +98,13 @@ async def list_students(
         limit: Maximum number of results (1-200, default 50).
         offset: Number of results to skip (default 0).
 
-    Returns: 
+    #### Returns
         List[StudentList]: Filtered and sorted list of student records.
 
-    Raises:
+    #### Raises
         400: Unsupported sort Field
 
-    Process:
+    #### Process
         - Initialize query for all students. 
         - Apply semester filter if semester_id is provided.
         - Apply status filter if status if provided (map string to StudentStatus enum).
@@ -116,7 +116,7 @@ async def list_students(
         - Execute query with ordering, limit, and offset
         - Convert database records to StudentList response models
 
-    Example:
+    #### Example
         GET /students?semester_id=5&status=active&q=john&sort=last_name:asc&limit=25
         
     """
@@ -164,19 +164,19 @@ async def list_students(
 async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
     """Update/Patch changes to a student's profile.
 
-    Args: 
+    #### Args
         student_id: Unique identifier for the student
         payload: StudentPatch object containing fields to update
 
-    Returns: 
+    #### Returns
         StudentRead: The updated student record
 
-    Raises: 
+    #### Raises
         404: Student not found
         400: No fields provided in payload
         409: Email already exists for another student
 
-    Process:
+    #### Process
         1. Retrieve student record by ID
         2. Raise 404 error if student doesn't exist
         3. Validate that at least one field is provided in payload
@@ -190,7 +190,7 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
         7. Save changes to database
         8. Return updated student record
 
-    Example:
+    #### Example
         PATCH /students/123
         Body: {"first_name": "John", "email": "john@example.com"}
       """
@@ -244,23 +244,23 @@ async def archive_student(student_id: int, body: ArchiveRequest = Body(default=A
     
     Archive a student there by removing them from the active list while preserving their data.
 
-    Args: 
+    #### Args
         student_id: Unique identifier for the student to restore.
         body: Archive request with optional reason body.
     
-    Return:
+    #### Return
         Success response. 
     
-    Raises:
+    #### Raises
         404: Student not found.
 
-    Process:
+    #### Process
         1. Retrieve student record by ID.
         2. Raise 404 if student doesn't exist.
         3. Call archive method with provided reason.
         4. Return 204 No Content status confirming the move.
 
-    Example: 
+    #### Example 
         POST /students/123/archive.
         Body: {"reason": "Passed"}.
     """
@@ -276,23 +276,23 @@ async def restore_student(student_id: int, body: RestoreRequest = Body(default=R
     
     Restore a student from being in the Archive making them visible in the active lists again. 
 
-    Args: 
+    #### Args 
         student_id: Unique identifier for the student to restore.
         body: RestoreRequest containing optional reason for restoration.
     
-    Returns:
+    #### Returns
         Success response.
     
-    Raises:
+    #### Raises
         404: Student not found.
 
-    Process:
+    #### Process
         1. Retrieve student record by ID.
         2. Raise 404 if student doesn't exist.
         3. Call restore method with provided reason.
         4. Return 204 No Content status.
     
-    Example:
+    #### Example
         POST: /students/123/restore
         Body: {"reason": "Re-enrolled for new semester"}
     """
@@ -308,16 +308,16 @@ async def delete_student_public(student_id: int = Path(..., ge=1)):
     
     This endpoint is intentionally disabled to prevent accidental permanent data loss. Use the archive endpoint instead to soft-delete students. Only Admins are able to hard delete records. 
     
-    Args: 
+    #### Args 
         student_id: Unique identifier for the student (not used).
     
-    Return:
+    #### Return
         Never returns successfully - always raises 404.
     
-    Raises:
+    #### Raises
         404: Always raised - deletion is disabled for safety.
     
-    Note:
+    #### Note
         This endpoint is hidden from API documentation (include_in_schema=False).
         Permanent deletion should only be done through admin tools or database access.
     """

@@ -1,9 +1,26 @@
 # app/tests/test_students_filters_sort.py
+
+"""Student Filtering system unit tests.
+
+
+"""
+
 import pytest
 import uuid
 from app.models.semester import Semester
 
 async def _create(async_client, **overrides):
+    """Creation of students profiles for unit testing.
+
+    Receives input from a unit test with a payload of student data. Populates it in the the testing db
+
+    #### Args 
+        payload: student data
+        overrides???
+
+    #### Returns
+        r: student json payload.
+    """
     i = overrides.get("i", 0)
     email = overrides.get("email") or f"user{i}-{uuid.uuid4().hex[:8]}@test.com"
     payload = {
@@ -19,6 +36,11 @@ async def _create(async_client, **overrides):
 
 @pytest.mark.asyncio
 async def test_filters_can_be_combined(async_client):
+    """Unit testing of if filters can be combined.
+
+    Creates differeing students, then tests if when reciving semester and status at the same time works.
+    
+    """
    # Semester creation
     sem1 = await Semester.create(name="S1")
     sem2 = await Semester.create(name="S2")

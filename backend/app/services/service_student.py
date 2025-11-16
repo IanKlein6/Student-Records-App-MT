@@ -5,12 +5,12 @@
 Provides business logic and data access operations for student management. 
 Handles validation, error mapping, audit logging, and database interactions.
 
-Services: 
+Services
     - hard_delete_student_service: Deletes student with audit trail. 
     - create_student_service: Creates student with validation and duplicate detection.    
 
 
-Info data pipeline:
+Info data pipeline
     Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database.
 """
 
@@ -26,7 +26,7 @@ async def hard_delete_student_service(student_obj: Student, reason: str | None =
     
     Takes a Student object plus a reason and writes a ArchiveLog with a HARD_DELETE tag + reason. Then deletes the student from the database. 
 
-    Info:
+    Info
         Log is created first so the entry survives even if FK on ArchiveLOG is SET_NULL
     """
     # Log first so the entry survives even if FK on ArchiveLog is SET_NULL

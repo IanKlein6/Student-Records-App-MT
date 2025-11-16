@@ -2,7 +2,7 @@
 
 """API health check and basic endpoints
 
-Tests the core FastAPI application endpoints to verify: 
+Tests the core FastAPI application endpoints to verify. 
   - Application is properly configured and running 
   - Health check endpoint returns expected response. 
 """

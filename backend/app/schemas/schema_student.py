@@ -4,7 +4,7 @@
 
 Defines the way in which student related data is validated, serialized, and exchanged through the API. They form the boundary between the database models and external clients (frontend, 3rd party integrations, etc.
 
-Classes: 
+Classes
     StudentCreate: Basic schema for creating a new student (POST /students).
     StudentPatch: Schema for changing/updating students data (PATCH /students{id}).
     StudentRead: Schema for retrieving all data from a student (GET /students{id}).
@@ -13,12 +13,12 @@ Classes:
     ArchiveRequest: End point for archive a student.
     RestoreRequest: End point for restoring a student if they are archived.
 
-Notes:
+Notes
     - All create and patch schemas use extra="forbid" field for stricter validation.
     - Response schemas (Read/List) use from_attributes=True for ORM compatibility.
     - This file complements app/models/model_student.py, which defines the database layer.
 
-Info data pipeline:
+Info data pipeline
     Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database. 
 """
 
@@ -33,16 +33,16 @@ class StudentCreate(BaseModel):
     """Schema for creating a new Student.
     
     Creates a new Student.
-       
-        Attributes: 
-            first_name (str): Student's first name (max 50 chars).
-            last_name (str): Student's last name (max 50 chars).
-            email (str): Student's email (Normalized using function NormalizedEmail in app.schema.types).
-            semester_id (int): Optional ID of the semester to assign the student to. 
-            group_id (int): Optional ID of the project group to assign the student to.
+    
+    #### Attributes
+        first_name (str): Student's first name (max 50 chars).
+        last_name (str): Student's last name (max 50 chars).
+        email (str): Student's email (Normalized using function NormalizedEmail in app.schema.types).
+        semester_id (int): Optional ID of the semester to assign the student to. 
+        group_id (int): Optional ID of the project group to assign the student to.
 
-        Configuration: 
-            model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
+    #### Configuration
+        model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
     """
     first_name: Str50 
     last_name: Str50
@@ -55,9 +55,9 @@ class StudentCreate(BaseModel):
 class StudentPatch(BaseModel):
     """Schema for updates to student records. 
     
-This schema supports PATCH operations where only specified fields are updated. All fields are optional - omitted fields remain unchanged in the database.
+    This schema supports PATCH operations where only specified fields are updated. All fields are optional - omitted fields remain unchanged in the database.
         
-    Attributes: 
+    #### Attributes
         first_name (str): Student's first name (max 50 chars).
         last_name (str): Students's last name (max 50 chars).
         email (str): Student's email (automatically normalized).
@@ -68,7 +68,7 @@ This schema supports PATCH operations where only specified fields are updated. A
         semester_id (int): ID of the semester the student is currently in.
         work_student_potential (char enum): Recruitment potential rating (low, medium, high).
 
-    Configuration:
+    #### Configuration
         All fields default to None. The API will only update fields that are explicitly provided in the request, leaving all others unchanged.
         model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
 """
@@ -89,23 +89,23 @@ class StudentRead(BaseModel):
 
     Used to retrieve all students information from the database. 
     
-        Attributes:
-            id (int): Students database id number. 
-            first_name (str): Student's first name (max 50 chars).
-            last_name (str): Students's last name (max 50 chars).
-            email (str): Student's email (automatically normalized).
-            status (charenum): Student's current course status (active, passed, failed, archived).
-            notes (text): Instructor's notes about the Students progress (max 255 chars).
-            group_id (int): ID of the project group the student is in.
-            semester_id (int): ID of the semester the student is currently in.
-            work_student_potential (charenum): Recruitment potential rating (low, medium, high).
-            attempt_num (int): Students number of attempts for the exam (max of 3) ## check if 3 is correct!
-            created_at (date/time): Exact time student profile was created.
-            updated_at (date/time): Exact time student profile was last updated.
-                
-                Configuration:
-                    All fields default to None. The API will only update fields that are explicitly provided in the request, leaving all others unchanged.
-                    model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
+    #### Attributes 
+        id (int): Students database id number. 
+        first_name (str): Student's first name (max 50 chars).
+        last_name (str): Students's last name (max 50 chars).
+        email (str): Student's email (automatically normalized).
+        status (charenum): Student's current course status (active, passed, failed, archived).
+        notes (text): Instructor's notes about the Students progress (max 255 chars).
+        group_id (int): ID of the project group the student is in.
+        semester_id (int): ID of the semester the student is currently in.
+        work_student_potential (charenum): Recruitment potential rating (low, medium, high).
+        attempt_num (int): Students number of attempts for the exam (max of 3) ## check if 3 is correct!
+        created_at (date/time): Exact time student profile was created.
+        updated_at (date/time): Exact time student profile was last updated.
+            
+    #### Configuration
+        All fields default to None. The API will only update fields that are explicitly provided in the request, leaving all others unchanged.
+        model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
 """
     id: int
     first_name: Str50
@@ -127,17 +127,17 @@ class StudentList(BaseModel): ## This might be obsolete if its possible to use S
 
     A Schema that defines the GET of student data from the data base for the purpose of displaying the students in a list. Is supposed to retrieve all students with only some of their most basic information to display in the frontend list which should then be able to sort the students by filters. Abstraction is the idea behind this.
     
-    Reasoning: 
+    #### Reasoning 
         - Retrieve all students at once in order to speed up filtering process since they would all be "pre-loaded" in the list and wouldn't have to be re-retrieved at the point of filtering.
         - This is intended to increase filtering speed and reduced student information to minium is intended to increase retrieval speed. 
         
-    Attributes:
+    #### Attributes
         id (int): Students database id number. 
         first_name (str): Student's first name (max 50 chars).
         last_name (str): Students's last name (max 50 chars).
         email (str): Student's email (automatically normalized).
 
-    Configuration:
+    #### Configuration
             model_config = ConfigDict(from_attributes=True), ensures clean ORM to JSON conversions so Tortoise models can be serialized safely. 
     """
     id: int

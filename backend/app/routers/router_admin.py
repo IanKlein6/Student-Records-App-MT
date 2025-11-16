@@ -5,14 +5,14 @@
 Handles administrative operations requiring elevated permissions. 
 All routes require valid admin token authentication via X-Admin-Token header. 
 
-Authentication: 
+Authentication
     Admin token validation is applied to all routes cia router-level dependency. 
     Token can be bypassed in test environment (TESTING=1).
 
-Routers: 
+Routers
     DELETE /admin/students/{student_id}: Permanently delete a student record.
 
-Data pipeline:
+Data pipeline
     Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database. 
  """
 
@@ -28,13 +28,13 @@ async def require_admin(request: Request):
     Checks for X-Admin-Token header and validates against ADMIN_TOKEN environment variable. 
     Bypassed automatically in test environments. 
 
-    Args: 
+    #### Args
         request: 403 if token is missing or invalid. 
 
-    Raises:
+    #### Raises
         HTTPException: 403 if token is missing or invalid.
 
-    Environment Variables: 
+    #### Environment Variables
         TESTING: Set to "1" to bypass authentication (test mode only).
         ADMIN_TOKEN: Expected admin token value (defaults to "dev-admin").
     """
@@ -70,14 +70,14 @@ async def hard_delete_student(
     
     **Warning**: This operation is irreversible. Use archive for all cases except when absolutely necessary.
     
-    Args: 
+    #### Args
         student_id: Unique student identifier.
     
-    Raises: 
+    #### Raises
         404: Student with given ID does not exist.
         403: if admin token is invalid.
     
-    Return: 
+    #### Return 
         204: success status code. 
     """
     
