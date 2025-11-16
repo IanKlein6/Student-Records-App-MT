@@ -3,7 +3,7 @@ import os
 import pytest
 import httpx
 from tortoise import Tortoise
-from app.main import app
+from backend.app.api import app
 
 @pytest.fixture(scope="session", autouse=True)
 def _testing_env():

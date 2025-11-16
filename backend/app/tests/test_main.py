@@ -1,6 +1,6 @@
 ## Testing for basic endpoints healthchecks
 
-from main import app
+from backend.app.api import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)

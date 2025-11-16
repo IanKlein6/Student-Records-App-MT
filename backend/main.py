@@ -1,5 +1,5 @@
 # backend/main.py
-from app.main import app
+from backend.app.api import app
 
 if __name__ == "__main__":
     import uvicorn
