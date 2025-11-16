@@ -323,3 +323,14 @@ Pending hygiene items
   - Current protections identified: Tortoise ORM prevents SQL injection, Pydantic validates input, extra="forbid" catches malicious fields
   - Security gaps identified: no authentication, no authorization, no rate limiting, need HTTPS in production
   - Created security checklist prioritizing authentication, HTTPS, secrets management, rate limiting, and CORS configuration
+
+## 16.11.25
+- Added doc strings to schema_students, model_students, service_student, main, api, router_admin, conftest, logger.
+- renamed several files to include their folder name plus their function name e.i. services/student.py to services/service_student.py
+  - Reason: naming scheme allows for better over view when having lots of tabs open being able to see which student.py actually does what.
+- renamed app/main.py to api.py because there are were two mains. One in backend/main.py and one in backend/app/main.py. app/main.py is also for apis so called it api. 
+- Refactored test structure in test_api.py to use async
+  - Reason: All other tests are using async as well as the functions their are testing are all async, thus it makes sense to change it for consistence and since the function should be tested exactly the way the function has also be created. 
+- Changed doc string scheme to include #### in front of any heading to bold them. This makes it easy to see the important parts when glancing over the docstring. 
+- Fixed doc string layout problem where doc strings didn't alway appear the same when hovering over function name.
+  - Fix: removed all ':' from after a heading which then allowed for consistent presentation of the doc strings.

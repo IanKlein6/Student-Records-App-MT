@@ -234,3 +234,10 @@ Next steps
 
 - Comprehensive error documentation in code
   - Why: Future maintainers need to understand error flow. Documented which layer handles which errors (Pydantic→422 schema, Service→business rules, Database→integrity). Comments explain sqlstate codes, bare raise rationale, race condition scenarios.
+
+## 16.11.25
+- Rename files to include folder names schema/student.py tp schema/schema_student.py
+    - Why: Simplifies understanding which student.py does what when having multiple pages open. 
+- All tests must be async if the function is async. 
+    - Why: If the function is async then we want to test it in the way it was meant to be which is async.
+    - Also all other tests are async so keeping with the scheme of the other tests. 
