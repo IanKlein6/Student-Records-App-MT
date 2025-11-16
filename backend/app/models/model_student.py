@@ -1,4 +1,17 @@
-# app/models/student.py
+# app/models/model_student.py
+
+"""Student Tortoise model.
+
+Tortoise model for defining students information in the database.
+
+Classes:
+    StudentStatus: Abstraction classes for status options.
+    WorkPotential: Abstraction classes for student potential rating.
+    Student(Model): Model for all of a students information.
+
+Info data pipeline:
+    Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database. 
+"""
 
 from enum import Enum
 from datetime import datetime, timezone

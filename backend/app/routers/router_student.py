@@ -1,6 +1,6 @@
 # backend/app/routers/router_student.py
-
-"""FastAPI router for students.
+ 
+"""Student FastAPI router.
 
 Routers: 
     create_student (POST): 
@@ -9,12 +9,12 @@ Routers:
     patch_student (PATCH):
     archive_student (POST):
     restore_student (POST):
-    delete_student_public (api_route):
+    delete_student_public (api_route): Disabled
 
 Notes: 
 
 Info data pipeline:
-    Frontend <--> FastApi router <--> Pydantic Schema. 
+    Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database. 
 """
 
 import logging
@@ -23,7 +23,7 @@ from fastapi import APIRouter, Path, Query, HTTPException, Response, Body
 from tortoise.exceptions import IntegrityError
 from tortoise.expressions import Q
 
-from app.models.student import Student, StudentStatus
+from backend.app.models.model_student import Student, StudentStatus
 from backend.app.schemas.schema_student import StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest
 from app.services.students import create_student_service
 
@@ -137,7 +137,7 @@ async def list_students(
     # sorting
     has_created = "created_at" in Student._meta.fields_map
     if not sort:
-         ## Debate changing to alphabetical sorting of last name for default... 
+        ## Debate changing to alphabetical sorting of last name for default... 
         order_fields = ["-created_at"] if has_created else ["-id"]  # default 
     else:
         field, direction = sort.split(":")
@@ -302,9 +302,9 @@ async def restore_student(student_id: int, body: RestoreRequest = Body(default=R
 
 @router.api_route("/{student_id}", methods=["DELETE"], include_in_schema=False)
 async def delete_student_public(student_id: int = Path(..., ge=1)):
-    """Permanent Deletion of a Student (disabled).
+    """Permanent Deletion of a Student (disabled for user : enabled for admin).
     
-    This endpoint is intentionally disabled to prevent accidental permanent data loss. Use the archive endpoint instead to soft-delete students. Will be in-abled when safety precautions have been met. 
+    This endpoint is intentionally disabled to prevent accidental permanent data loss. Use the archive endpoint instead to soft-delete students. Only Admins are able to hard delete records. 
     
     Args: 
         student_id: Unique identifier for the student (not used).

@@ -1,7 +1,7 @@
 # backend/app/routers/router_admin.py
 import os
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, Path
-from app.models.student import Student
+from backend.app.models.model_student import Student
 from app.services.students import hard_delete_student_service
 
 async def require_admin(request: Request):

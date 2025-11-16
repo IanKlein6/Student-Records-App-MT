@@ -18,11 +18,11 @@ Notes:
     - Response schemas (Read/List) use from_attributes=True for ORM compatibility.
     - This file complements app/models/model_student.py, which defines the database layer.
 
-Info Data Pipeline:
-    FastAPI endpoint <--> Pydantic schema <--> Tortoise model.
+Info data pipeline:
+    Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database. 
 """
 
-from app.models.student import Student, StudentStatus, WorkPotential
+from backend.app.models.model_student import Student, StudentStatus, WorkPotential
 from pydantic import BaseModel
 from pydantic.config import ConfigDict
 from datetime import datetime
@@ -53,25 +53,25 @@ class StudentCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 class StudentPatch(BaseModel):
-    """Schema for updates to student records.
+    """Schema for updates to student records. 
     
-    This schema supports PATCH operations where only specified fields are updated. All fields are optional - omitted fields remain unchanged in the database.
-    
-        Attributes: 
-            first_name (str): Student's first name (max 50 chars).
-            last_name (str): Students's last name (max 50 chars).
-            email (str): Student's email (automatically normalized).
-            status (charenum): Student's current course status (active, passed, failed, archived).
-            notes (text): Instructor's notes about the Students progress (max 255 chars).
-            # group (int):  ## Does this need to exist since we already have group_id ?? 
-            group_id (int): ID of the project group the student is in.
-            semester_id (int): ID of the semester the student is currently in.
-            work_student_potential (charenum): Recruitment potential rating (low, medium, high).
+This schema supports PATCH operations where only specified fields are updated. All fields are optional - omitted fields remain unchanged in the database.
+        
+    Attributes: 
+        first_name (str): Student's first name (max 50 chars).
+        last_name (str): Students's last name (max 50 chars).
+        email (str): Student's email (automatically normalized).
+        status (char enum): Student's current course status (active, passed, failed, archived).
+        notes (text): Instructor's notes about the Students progress (max 255 chars).
+        # group (int):  ## Does this need to exist since we already have group_id ?? 
+        group_id (int): ID of the project group the student is in.
+        semester_id (int): ID of the semester the student is currently in.
+        work_student_potential (char enum): Recruitment potential rating (low, medium, high).
 
-        Configuration:
-            All fields default to None. The API will only update fields that are explicitly provided in the request, leaving all others unchanged.
-            model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
-        """
+    Configuration:
+        All fields default to None. The API will only update fields that are explicitly provided in the request, leaving all others unchanged.
+        model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
+"""
     first_name: Optional[Str50] = None
     last_name: Optional[Str50] = None
     email: Optional[NormalizedEmail] = None
@@ -102,11 +102,11 @@ class StudentRead(BaseModel):
             attempt_num (int): Students number of attempts for the exam (max of 3) ## check if 3 is correct!
             created_at (date/time): Exact time student profile was created.
             updated_at (date/time): Exact time student profile was last updated.
-            
-            Configuration:
-                All fields default to None. The API will only update fields that are explicitly provided in the request, leaving all others unchanged.
-                model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
-    """
+                
+                Configuration:
+                    All fields default to None. The API will only update fields that are explicitly provided in the request, leaving all others unchanged.
+                    model_config: extra="forbid", Rejects any fields not defined in this schema, helping catch typos and prevent malicious data injection. 
+"""
     id: int
     first_name: Str50
     last_name: Str50

@@ -1,8 +1,22 @@
 # app/services/students.py
 
+"""Student service layer.
+
+Provides business logic and data access operations for student management. 
+Handles validation, error mapping, audit logging, and database interactions.
+
+Services: 
+    - hard_delete_student_service: Deletes student with audit trail. 
+    - create_student_service: Creates student with validation and duplicate detection.    
+
+
+Info data pipeline:
+    Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database.
+"""
+
 from fastapi import HTTPException
 from tortoise.exceptions import IntegrityError
-from app.models.student import Student
+from backend.app.models.model_student import Student
 from app.models.semester import Semester
 from app.models.archive_log import ArchiveLog, ArchiveAction
 
@@ -10,7 +24,7 @@ from app.models.archive_log import ArchiveLog, ArchiveAction
 async def hard_delete_student_service(student_obj: Student, reason: str | None = None) -> None:
     """Hard Delete wrapper for deleting a Student.
     
-    Takes a Student object and a reason and writes a ArchiveLog with a HARD_DELETE tag + reason. Then deletes the student from the database. 
+    Takes a Student object plus a reason and writes a ArchiveLog with a HARD_DELETE tag + reason. Then deletes the student from the database. 
 
     Info:
         Log is created first so the entry survives even if FK on ArchiveLOG is SET_NULL
