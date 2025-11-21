@@ -1,14 +1,21 @@
 # app/tests/test_students_filters_sort.py
 
-"""Student Filtering system unit tests.
+"""Unit tests for student filtering and sorting functionality.
 
-    Test Setup: 
-        _create: creates model for student creation in test DB
+Tests the /students endpoints ability to filter and sort student records using various  query parameters including status, semester_id, text search, and sort options.
+    
+Fixtures:
+    _create: Helper function to create test student records with defaults
 
-    Tests:
-        test_filters_can_be_combined: Checks if various filters can be combined when retrieving students @ /students (e.i status, semester_id)
-        test_sort_by_name_and_email: Checks if students can be sorted by name and email in ascending/descending order. 
-        test_default_sort_is_newest_first: Check if default sort setting returns newest added student first. 
+Test Coverage:
+    test_filters_can_be_combined: 
+        Verifies multiple filters (status, semester_id, q) work simultaneously
+        
+    test_sort_by_name_and_email: 
+        Validates sorting by name (last, first) ascending and email descending
+        
+    test_default_sort_is_newest_first: 
+        Confirms default sort order returns newest students first (created_at desc)
 """
 
 import pytest

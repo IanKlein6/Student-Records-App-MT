@@ -1,4 +1,41 @@
 # app/tests/test_students.py
+
+"""Unit tests for student  CRUD operations and lifecycle management.
+
+Tests the /students endpoints for creating, retrieving, updating, archiving, and deleting student records. Validates data validation, error handling, and business logic enforcement. 
+
+Test Coverage
+    Creation (POST /students):
+        test_create_student: Successful creation with whitespace trimming
+        test_create_student_422_missing: Missing required fields
+        test_create_student_422_bad_email: Invalid email format
+        test_create_student_422_invalid_semester: Non-existent semester FK
+        test_create_student_duplicate_email: Duplicate email rejection (409)
+        test_create_student_location: Location header validation
+
+    Retrieval (GET /students/{id}):
+        test_get_student_200: Successful retrieval of an existing student
+        test_get_student_404: Non-existent student
+
+    Update (PATCH /students{id}):
+        test_patch_student_200: Successful updating of a students field
+        test_patch_student_409_duplicate_email: Email uniqueness enforcement 
+        test_patch_student_404: Non-existent student. 
+
+    Lifecycle Management:
+        test_archive_then_restore: Archive - status=archived - restore - status=active
+        test_archive_restore_404: Archive/restore non-existent students
+
+        test_delete_student_404: Archive/restore non-existent students
+        test_delete_students_not_allowed: Non-admin hard delete success (in production is disabled)
+        test_admin_hard_delete: Admin hard delete (permanent removal)
+    
+Fixtures
+    _create: Helper to create test students with default values
+    async_client: Configured httpx client (from conftest.py)
+    db: Temporary in-memory database (from conftest.py)
+"""
+
 import pytest
 
 
