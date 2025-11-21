@@ -36,7 +36,7 @@ app.include_router(admin_router)
 if not TESTING:
     register_tortoise(
         app,
-        db_url="postgres://postgres:postgres@localhost:5432/student_records",
+        db_url=os.getenv("DATABASE_URL"),
         modules={
             "models": [
                 "app.models.student", ## Might have to add backend. to the beginning of all of them to make it work right??? 

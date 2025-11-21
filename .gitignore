@@ -1,6 +1,4 @@
 # Byte-compiled / compiled files
-__pycache__/
-*.py[cod]
 *.so
 
 # Virtual environments
@@ -30,3 +28,22 @@ Thumbs.db
 
 # dotenv
 .env
+
+# Claude Code
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.egg-info/
+
+# Build
+dist/
+
+# Pytest
+.pytest_cache/
+
+# Coverage reports
+.coverage
+

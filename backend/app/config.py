@@ -1,19 +1,10 @@
 # backend/app/config.py
+
+import os
+
 TORTOISE_ORM = {
     "connections": {
-        # Either DSN string…
-        "default": "postgres://postgres:postgres@localhost:5432/student_records",
-        # …or explicit engine credentials (either form works)
-        # "default": {
-        #     "engine": "tortoise.backends.asyncpg",
-        #     "credentials": {
-        #         "host": "localhost",
-        #         "port": 5432,
-        #         "user": "postgres",
-        #         "password": "postgres",
-        #         "database": "student_records",
-        #     },
-        # },
+        "default": os.getenv("DATABASE_URL"),
     },
     "apps": {
         "models": {
