@@ -90,6 +90,7 @@
   - 1 semester student flow: logic showing the logic of how a student progresses through the app
   - 2 semester student flow: explained. more in depth explaining of what happens in the app in regard to the student and their attempts and interaction with the examiner and scheduling. 
 - started on Diagram Request/Response Flow for critical Action
+<<<<<<< HEAD
   - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense. 
 
 ## 09-08-2025
@@ -334,3 +335,6 @@ Pending hygiene items
 - Changed doc string scheme to include #### in front of any heading to bold them. This makes it easy to see the important parts when glancing over the docstring. 
 - Fixed doc string layout problem where doc strings didn't alway appear the same when hovering over function name.
   - Fix: removed all ':' from after a heading which then allowed for consistent presentation of the doc strings.
+=======
+  - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense.
+>>>>>>> feature/student_model

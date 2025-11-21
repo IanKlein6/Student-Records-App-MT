@@ -217,6 +217,7 @@ Next steps
 - Validate email uniqueness via database constraints, not pre-checks
   - Why: Prevents race conditions. Pre-checking email existence then creating student creates window where another request could create same email between check and insert. Database UNIQUE constraint is atomic and authoritative.
 
+<<<<<<< HEAD
 - Keep routers thin - no try/except for HTTPException
   - Why: FastAPI automatically catches and formats HTTPException responses. Adding try/except in routers creates boilerplate and violates single responsibility. Service layer handles business logic and raises exceptions; routers just pass through.
 
@@ -241,3 +242,7 @@ Next steps
 - All tests must be async if the function is async. 
     - Why: If the function is async then we want to test it in the way it was meant to be which is async.
     - Also all other tests are async so keeping with the scheme of the other tests. 
+=======
+## 2025-08-03 Appointments Link Students, Technika, and Slots  
+Reason: The `appointments` table serves as the source of truth for scheduling, tying together the student, technika, and time slot in one place.
+>>>>>>> feature/student_model

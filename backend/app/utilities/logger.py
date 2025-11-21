@@ -1,4 +1,19 @@
-##Creation of special loggers that help keep logging simple and readable. Add loggers as needed to make overviews easier and more direct 
+# app/utilities/logger.py
+
+"""Logger Configs.
+
+Configuration and centralizing of loggers to help keep logging simple, readable and in one place. 
+
+Loggers: 
+    create_logger:
+    query_logger:
+    delete_logger:
+    error_logger:
+
+Info:
+    - Change logger basicConfig setting once in production.
+    - Add extra loggers as needed.
+"""
 
 import logging
 from pathlib import Path
@@ -8,7 +23,7 @@ from logging.handlers import RotatingFileHandler
 log_dir = Path("logs")
 log_dir.mkdir(exist_ok=True)
 
-#Rotating file handler
+# Rotating file handler
 file_handler = RotatingFileHandler("app.log", maxBytes=1_000_000, backupCount=3)
 
 
