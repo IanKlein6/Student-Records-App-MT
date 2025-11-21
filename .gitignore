@@ -4,6 +4,10 @@
 # Virtual environments
 .venv/
 env/
+.env
+backend/.env
+frontend/.env
+*.env
 
 # Tortoise ORM
 *.sqlite3
