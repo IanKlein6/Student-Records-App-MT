@@ -31,3 +31,11 @@ repos:
       - id: check-merge-conflict
       # Ensure files are valid JSON
       - id: check-json
+
+  # Secret detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: 'package.lock.json|\.env\.example$|README\.md'

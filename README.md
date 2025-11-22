@@ -319,6 +319,7 @@ poetry run pytest backend/app/tests/test_students.py -v
 - **Soft Delete by Default** - Prevents accidental data loss
 - **Comprehensive Audit Logging** - ArchiveLog tracks all sensitive operations
 - **Secure Development Practices** - No secrets in code, clean git history
+- **Secret Detection commit Pipeline** - checks every commit for possible data leak possibilities.
 
 ### Planned Security Features (Pre-Production)
 
@@ -363,12 +364,14 @@ poetry run pytest backend/app/tests/test_students.py -v
 - All sensitive credentials stored in `.env` files (gitignored)
 - No hardcoded passwords, API keys, or tokens in code
 - Environment variable validation on startup
+- Implemented Secret Detection in commit pipeline to scan for potential secrete leaks.
 
-**Code Quality:**
+**Code Quality Pipeline:** Git commit pipeline using pre-commit hooks to scan code quality before committing.
 - Comprehensive PEP 257 docstrings
 - Type hints throughout codebase
 - Linting with Ruff
-- Pre-commit hooks (planned)
+- Pre-commit hooks
+- Security Detection
 
 ---
 
