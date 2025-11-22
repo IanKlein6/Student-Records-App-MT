@@ -2,7 +2,7 @@
 
 """Unit tests for student  CRUD operations and lifecycle management.
 
-Tests the /students endpoints for creating, retrieving, updating, archiving, and deleting student records. Validates data validation, error handling, and business logic enforcement. 
+Tests the /students endpoints for creating, retrieving, updating, archiving, and deleting student records. Validates data validation, error handling, and business logic enforcement.
 
 Test Coverage
     Creation (POST /students):
@@ -19,8 +19,8 @@ Test Coverage
 
     Update (PATCH /students{id}):
         test_patch_student_200: Successful updating of a students field
-        test_patch_student_409_duplicate_email: Email uniqueness enforcement 
-        test_patch_student_404: Non-existent student. 
+        test_patch_student_409_duplicate_email: Email uniqueness enforcement
+        test_patch_student_404: Non-existent student.
 
     Lifecycle Management:
         test_archive_then_restore: Archive - status=archived - restore - status=active
@@ -29,7 +29,7 @@ Test Coverage
         test_delete_student_404: Archive/restore non-existent students
         test_delete_students_not_allowed: Non-admin hard delete success (in production is disabled)
         test_admin_hard_delete: Admin hard delete (permanent removal)
-    
+
 Fixtures
     _create: Helper to create test students with default values
     async_client: Configured httpx client (from conftest.py)
@@ -49,6 +49,7 @@ async def test_get_student_200(async_client):
     assert data["id"] == s["id"]
     assert data["email"] == "get200@test.com"
 
+
 # 200: PATCH existing (update first_name)
 @pytest.mark.asyncio
 async def test_patch_student_200(async_client):
@@ -59,56 +60,62 @@ async def test_patch_student_200(async_client):
     assert data["id"] == s["id"]
     assert data["first_name"] == "New"
 
+
 # 422: missing required fields
 @pytest.mark.asyncio
 async def test_create_student_422_missing(async_client):
     r = await async_client.post("/students", json={"first_name": "A"})
     assert r.status_code == 422
 
+
 # 422: bad email
 @pytest.mark.asyncio
 async def test_create_student_422_bad_email(async_client):
-    r = await async_client.post("/students", json={
-        "first_name": "A", "last_name": "B", "email": "not-an-email"
-    })
+    r = await async_client.post(
+        "/students", json={"first_name": "A", "last_name": "B", "email": "not-an-email"}
+    )
     assert r.status_code == 422
+
 
 # 404: GET non-existent
 @pytest.mark.asyncio
 async def test_get_student_404(async_client):
     r = await async_client.get("/students/999999")
-    assert r.status_code == 404 
+    assert r.status_code == 404
+
 
 # 404: PATCH non-existent
 @pytest.mark.asyncio
 async def test_patch_student_404(async_client):
     r = await async_client.patch("/students/999999", json={"first_name": "New"})
-    assert r.status_code == 404 
+    assert r.status_code == 404
+
 
 # 404 DELETE non-existent
 @pytest.mark.asyncio
 async def test_delete_student_404(async_client):
     r = await async_client.delete("/students/999999")
-    assert r.status_code == 404 
+    assert r.status_code == 404
+
 
 @pytest.mark.asyncio
 async def test_create_student_422_invalid_semester(async_client):
-    r = await async_client.post("/students", json={
-        "first_name": "Fk",
-        "last_name": "Error",
-        "email": "fkerror@example.com",
-        "semester_id": 999999
-    })
+    r = await async_client.post(
+        "/students",
+        json={
+            "first_name": "Fk",
+            "last_name": "Error",
+            "email": "fkerror@example.com",
+            "semester_id": 999999,
+        },
+    )
     assert r.status_code == 422
+
 
 # CREATE student
 @pytest.mark.asyncio
 async def test_create_student(async_client):
-    payload = {
-        "first_name": " Alex ",
-        "last_name": " Heartt ",
-        "email": " ALEXHEARTT@TEST1.com"
-    }
+    payload = {"first_name": " Alex ", "last_name": " Heartt ", "email": " ALEXHEARTT@TEST1.com"}
 
     r = await async_client.post("/students", json=payload)
     assert r.status_code == 201
@@ -118,14 +125,11 @@ async def test_create_student(async_client):
     assert data["email"] == "alexheartt@test1.com"
     assert "id" in data
 
+
 # Email check
 @pytest.mark.asyncio
 async def test_create_student_duplicate_email(async_client):
-    payload = {
-        "first_name": "Grace",
-        "last_name": "Hopper",
-        "email": "dup@example.com"
-    }
+    payload = {"first_name": "Grace", "last_name": "Hopper", "email": "dup@example.com"}
     r1 = await async_client.post("/students", json=payload)
     assert r1.status_code == 201
 
@@ -133,9 +137,12 @@ async def test_create_student_duplicate_email(async_client):
     assert r2.status_code == 409
     assert r2.json()["detail"] == "Email already exists"
 
+
 @pytest.mark.asyncio
 async def test_patch_student_409_duplicate_email(async_client):
-    s1 = await _create(async_client, email="dup1@ex.com")
+    _s1 = await _create(
+        async_client, email="dup1@ex.com"
+    )  # "_" in _s1 is used to fix a ruff flag since s1 isn't being called at the moment.
     s2 = await _create(async_client, email="dup2@ex.com")
     r = await async_client.patch(f"/students/{s2['id']}", json={"email": "dup1@ex.com"})
     assert r.status_code == 409
@@ -149,7 +156,7 @@ async def test_create_student_location(async_client):
         "last_name": "Turing",
         "email": "turing@example.com",
     }
-    
+
     r = await async_client.post("/students", json=payload)
     assert r.status_code == 201
 
@@ -163,11 +170,14 @@ async def test_create_student_location(async_client):
     assert student_id.isdigit()
 
 
-# Create student in memory for testing below 
+# Create student in memory for testing below
 async def _create(async_client, first="Alex", last="Heartt", email="alex@test.com"):
-    r = await async_client.post("/students", json={"first_name": first, "last_name": last, "email": email})
+    r = await async_client.post(
+        "/students", json={"first_name": first, "last_name": last, "email": email}
+    )
     assert r.status_code == 201, r.text
     return r.json()
+
 
 # Archive + restore flow
 @pytest.mark.asyncio
@@ -179,15 +189,16 @@ async def test_archive_then_restore(async_client):
     assert r.status_code == 204
 
     r2 = await async_client.get(f"/students/{sid}")
-    assert r2.status_code == 200 
+    assert r2.status_code == 200
     assert r2.json()["status"] == "archived"
 
     r3 = await async_client.post(f"/students/{sid}/restore")
     assert r3.status_code == 204
 
     r4 = await async_client.get(f"/students/{sid}")
-    assert r4.status_code == 200 
+    assert r4.status_code == 200
     assert r4.json()["status"] == "active"
+
 
 # Hard delete (admin)
 @pytest.mark.asyncio
@@ -199,16 +210,18 @@ async def test_admin_hard_delete(async_client):
     r = await async_client.delete(f"/admin/students/{sid}")
     assert r.status_code == 204
 
-    r2= await async_client.get(f"/students/{sid}")
+    r2 = await async_client.get(f"/students/{sid}")
     assert r2.status_code == 404
+
 
 # 404 on archive/restore non-existent
 @pytest.mark.asyncio
 async def test_archive_restore_404(async_client):
     r = await async_client.post("/students/999999/archive")
-    assert r.status_code == 404 
+    assert r.status_code == 404
     r2 = await async_client.post("/students/999999/restore")
-    assert r2.status_code == 404 
+    assert r2.status_code == 404
+
 
 # Ensure DELETE /students/{id} is gone (405)
 @pytest.mark.asyncio
@@ -224,8 +237,8 @@ async def test_delete_students_not_allowed(async_client):
 # Delete test
 
 
-     # OPTIONAL (enable later): if you add GET /students/{id}, verify it resolves
-    # r2 = await async_client.get(location)
-    # assert r2.status_code == 200
-    # data = r2.json()
-    # assert str(data["id"]) == student_id
+# OPTIONAL (enable later): if you add GET /students/{id}, verify it resolves
+# r2 = await async_client.get(location)
+# assert r2.status_code == 200
+# data = r2.json()
+# assert str(data["id"]) == student_id

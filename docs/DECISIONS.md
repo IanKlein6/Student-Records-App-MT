@@ -5,7 +5,7 @@
 Reason: Decision explained why
 
 
-## 2025-07-01 
+## 2025-07-01
 - Using Tortoise ORM with FastAPI
     - Reason: Simpler integration for async Python; aligns with Poetry setup
 
@@ -20,7 +20,7 @@ Reason: Decision explained why
     - Reason: Easier to test and evolve without model bloat
 
 
-## 2025-08-01 
+## 2025-08-01
 - Rename `trials` to `exam_attempt_evaluation`
     - Reason: The term “trial” was ambiguous. The new name reflects its role as a formal record of either a protocol or oral exam attempt.
 - Scheduling is based on `availability_slots` and linked to `appointments`
@@ -31,7 +31,7 @@ Reason: Decision explained why
     - Reason: The logic for retrying is modeled in Excalidraw as decision diamonds; if max attempts aren’t reached, the student may reattempt via a new appointment.
 
 
-## 2025-08-03 
+## 2025-08-03
 - Five Core Diagrams Chosen for Initial Planning
     - Reason: To keep planning lightweight but effective, five diagrams were selected as the minimum necessary to guide backend development: ERD, Retry Flow, System Overview, Student State Lifecycle, and a Request/Response Flow. Other diagrams (email, calendar UI) will be created only as needed during development.
 - Email and Auth Integration Deferred
@@ -44,26 +44,26 @@ Reason: Decision explained why
     - Reason: Backend model design and logic will lead the project. The frontend will be built as a lightweight shell on top, with refinement, email, and security added after the logic is working.
 - Diagrams Used for Orientation, Not Exhaustiveness
     - Reason: Diagrams are for understanding and navigation — not full documentation. Unplanned diagrams will be created only when needed, allowing development to continue without over-planning.
-- Backend Role and Flow Clarified  
+- Backend Role and Flow Clarified
     - Reason: Confirmed that FastAPI is the core backend and not just middleware. Requests flow: Frontend → FastAPI → Tortoise ORM → PostgreSQL.
-- Security Layers Sketched in Architecture  
+- Security Layers Sketched in Architecture
     - Reason: Security and validation will be handled at key points in the request lifecycle: between Frontend and FastAPI (via Firebase Auth and request validation) and between FastAPI and the database (via ORM-level schema enforcement).
-- `status` Replaces `active` on Student  
+- `status` Replaces `active` on Student
     - Reason: A string-based `status` field allows for clearer state tracking (`"active"`, `"passed"`, `"failed"`) than a boolean flag.
-- Group–Student Link Moved to Separate Table  
+- Group–Student Link Moved to Separate Table
     - Reason: A separate `student_group_memberships` table better reflects the many-to-many relationship between students and groups and keeps `students` clean.
-- Attempts No Longer Store Group ID  
+- Attempts No Longer Store Group ID
     - Reason: Group affiliation is not needed at the `attempt` level since scheduling is handled through the `appointments` table. This reduces redundancy.
-- Appointments Link Students, Technika, and Slots  
+- Appointments Link Students, Technika, and Slots
     - Reason: The `appointments` table serves as the source of truth for scheduling, tying together the student, technika, and time slot in one place.
 
-## 09-08-25 
+## 09-08-25
 - Enum fields will use CharEnumField
-    - Reason: decided to use Enum because FrozenSets are not available in Tortoise. 
+    - Reason: decided to use Enum because FrozenSets are not available in Tortoise.
 - Time Stamp created in Student
     - Reason: time stamp helps see when the student was created/ when they started
 - Indexs will be meta in models
-    - Reason: meta instead of inline because simpler coding and overview. 
+    - Reason: meta instead of inline because simpler coding and overview.
 - Composite indexes
     - Reason: used when possible for indexes that are frequently searched
 
@@ -113,7 +113,7 @@ Routing Conventions
     - Decision: expose plural aliases to match spec (/students, /students/{id}) while keeping current paths for backward compatibility.
     - Rationale: aligns with REST naming without breaking existing usage.
 
-## 27-08-25 
+## 27-08-25
 - Archiving location
     - Decision: Put archive() / restore() on the Student model for now.
     - Rationale: Centralizes invariants; ergonomic calls from anywhere; easy to evolve.
@@ -238,11 +238,11 @@ Next steps
 
 ## 16.11.25
 - Rename files to include folder names schema/student.py tp schema/schema_student.py
-    - Why: Simplifies understanding which student.py does what when having multiple pages open. 
-- All tests must be async if the function is async. 
+    - Why: Simplifies understanding which student.py does what when having multiple pages open.
+- All tests must be async if the function is async.
     - Why: If the function is async then we want to test it in the way it was meant to be which is async.
-    - Also all other tests are async so keeping with the scheme of the other tests. 
+    - Also all other tests are async so keeping with the scheme of the other tests.
 =======
-## 2025-08-03 Appointments Link Students, Technika, and Slots  
+## 2025-08-03 Appointments Link Students, Technika, and Slots
 Reason: The `appointments` table serves as the source of truth for scheduling, tying together the student, technika, and time slot in one place.
 >>>>>>> feature/student_model

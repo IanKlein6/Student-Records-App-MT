@@ -1,0 +1,33 @@
+# Pre-commit hooks configuration
+# Runs automatically on every git commit to ensure code quality
+
+repos:
+  # Ruff linter and formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      # Run the linter (checks for errors, unused imports, etc.)
+      - id: ruff
+        args: [--fix]
+        files: ^backend/
+      # Run the formatter (consistent code style)
+      - id: ruff-format
+        files: ^backend/
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+      # Ensure files end with a newline
+      - id: end-of-file-fixer
+      # Validate YAML syntax
+      - id: check-yaml
+      # Prevent large files from being committed
+      - id: check-added-large-files
+        args: ['--maxkb=1000']  # Max 1MB
+      # Check for merge conflict markers
+      - id: check-merge-conflict
+      # Ensure files are valid JSON
+      - id: check-json

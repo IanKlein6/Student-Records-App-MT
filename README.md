@@ -15,11 +15,13 @@ This project is currently in **Phase 2** of development. Core backend functional
 
 **WARNING: This application is NOT production-ready in its current state. Additional security hardening and compliance measures are required before handling real student data.**
 
+**Important:** This application is not currently fully functional. As parts become fully functional they will be pushed to main and then this note will be edited.
+
 ---
 
 ## Project Context
 
-This application is a **proof-of-concept solution** designed for the Messtenich program at the University of Freiburg, aimed at replacing their current Excel-based workflow for managing student exam records and scheduling.
+This application is a **proof-of-concept solution** designed for the Messtechnik program at the University of Freiburg, aimed at replacing their current Excel-based workflow for managing student exam records and scheduling.
 
 **Development Status:** Personal project built independently. Once a functional prototype is complete, it will be presented to program administrators for potential adoption.
 
@@ -27,7 +29,7 @@ This application is a **proof-of-concept solution** designed for the Messtenich 
 
 **Problem Being Solved:** The current Excel spreadsheet workflow for tracking student attendance, exam attempts, retry logic, and examiner scheduling creates inefficiencies, data integrity issues, and coordination challenges. This system provides a centralized, automated, and user-friendly alternative.
 
-**Note:** This is an independent initiative, not commissioned by or affiliated with the University of Freiburg. Any official deployment would require university IT security review, GDPR compliance verification, and formal approval.
+**Note: This is an independent initiative, not commissioned by or affiliated with the University of Freiburg. Any official deployment would require university IT security review, GDPR compliance verification, and formal approval.**
 
 ---
 
@@ -126,9 +128,7 @@ student_records_app_mt/
 
 ---
 
-## Getting Started 
-
-**Important:** This application is not currently fully functional. As parts become fully functional they will be pushed to main and then this note will be edited.
+## Getting Started
 
 ### Prerequisites
 
@@ -397,7 +397,7 @@ However, feedback and suggestions are welcome! Feel free to:
 
 ## Acknowledgments
 
-- **Inspiration:** This project was inspired by the operational needs of the Messtenich program at the University of Freiburg
+- **Inspiration:** This project was inspired by the operational needs of the Messtechnik program at the University of Freiburg
 - **Learning Resources:** FastAPI documentation, Tortoise ORM guides, and the broader Python community
 - **Problem Domain Insight:** Feedback and requirements discussions with program staff (informal)
 
@@ -413,8 +413,8 @@ For inquiries about usage or collaboration, please contact the author.
 
 ## Contact
 
-**Ian Klein**  
-GitHub: [@IanKlein6](https://github.com/IanKlein6)  
+**Ian Klein**
+GitHub: [@IanKlein6](https://github.com/IanKlein6)
 Location: Freiburg, Germany
 
 ---

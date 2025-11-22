@@ -3,32 +3,35 @@
 """Unit tests for student filtering and sorting functionality.
 
 Tests the /students endpoints ability to filter and sort student records using various  query parameters including status, semester_id, text search, and sort options.
-    
+
 Fixtures:
     _create: Helper function to create test student records with defaults
 
 Test Coverage:
-    test_filters_can_be_combined: 
+    test_filters_can_be_combined:
         Verifies multiple filters (status, semester_id, q) work simultaneously
-        
-    test_sort_by_name_and_email: 
+
+    test_sort_by_name_and_email:
         Validates sorting by name (last, first) ascending and email descending
-        
-    test_default_sort_is_newest_first: 
+
+    test_default_sort_is_newest_first:
         Confirms default sort order returns newest students first (created_at desc)
 """
 
-import pytest
 import uuid
+
+import pytest
+
 from app.models.semester import Semester
+
 
 async def _create(async_client, **overrides):
     """Create a student profile in the test database.
 
-    Test helper function that generates and posts student data with sensible defaults. 
-    Allows selective override of any field via kwargs for flexible test scenarios. 
+    Test helper function that generates and posts student data with sensible defaults.
+    Allows selective override of any field via kwargs for flexible test scenarios.
 
-    Args 
+    Args
         async_client: Configured httpx AsyncClient fixture for API requests
         **overrides: Optional field overrides. Supported keys:
             - i (int): Index for generating unique default names (default: 0)
@@ -40,8 +43,8 @@ async def _create(async_client, **overrides):
 
     Returns
         dict: JSON response containing created student data with assigned ID
-    
-    Raises: 
+
+    Raises:
         AssertionError: If API returns non-301 status code
     """
     i = overrides.get("i", 0)
@@ -57,9 +60,10 @@ async def _create(async_client, **overrides):
     assert r.status_code == 201, f"Expected 201, got {r.status_code}. Body: {r.text}"
     return r.json()
 
+
 @pytest.mark.asyncio
 async def test_filters_can_be_combined(async_client):
-    """Test that multiple query filters work simultaneously. 
+    """Test that multiple query filters work simultaneously.
 
     Verifies the /students endpoint correctly combines semester_id, status, and text search (q) filters to return only matching records.
 
@@ -72,7 +76,7 @@ async def test_filters_can_be_combined(async_client):
     Test Case
         Query with semester_id=S1 + status=active + q="ann"
         Expected: Only Student 1 (Anna) should match all criteria
-    
+
     Args
         async_client: Configured httpx AsyncClient fixture for API requests
 
@@ -81,7 +85,7 @@ async def test_filters_can_be_combined(async_client):
         Archive request returns 204 (archive successful)
         Combine filter query returns 200 with only Student 1
     """
-   # Semester creation
+    # Semester creation
     sem1 = await Semester.create(name="S1")
     sem2 = await Semester.create(name="S2")
 
@@ -99,19 +103,22 @@ async def test_filters_can_be_combined(async_client):
     assert r.status_code == 204
 
     # Combine: semester_id=1 + status=active + q='ann' (ILIKE first/last)
-    r = await async_client.get("/students", params={"semester_id": sem1.id, "status": "active", "q": "ann"})
+    r = await async_client.get(
+        "/students", params={"semester_id": sem1.id, "status": "active", "q": "ann"}
+    )
     assert r.status_code == 200
     data = r.json()
     # Should only return s1 (Anna Zeus)
     ids = [row["id"] for row in data]
     assert ids == [s1["id"]]
 
+
 @pytest.mark.asyncio
 async def test_sort_by_name_and_email(async_client):
     """Test Students can be sorted by name and by email.
-    
+
     Verifies that /students endpoint correctly sorts results alphabetically by last name + first name (ascending) and by email (descending).
-    
+
     Test Setup
         - Alex Miller (b@example.com)
         - Bea Anders (c@example.com)
@@ -120,7 +127,7 @@ async def test_sort_by_name_and_email(async_client):
     Test Case
         - sort=name:asc - Anders (Bea), Anders (Carl), Miller (Alex)
         - Combined with  q filter - Anders students maintain sort order.
-        - sort=email:decs - c@, b@, a@ (descending) 
+        - sort=email:decs - c@, b@, a@ (descending)
 
     Args
         async_client: Configured httpx AsyncClient fixture for API requests.
@@ -129,22 +136,35 @@ async def test_sort_by_name_and_email(async_client):
         All sort requests return 200 status
         Name sort requests return 200 status
         Email sorting orders by email descending
-"""
-    a = await _create(async_client, i=10, first_name="Alex", last_name="Miller", email="b@example.com")
-    b = await _create(async_client, i=11, first_name="Bea", last_name="Anders", email="c@example.com")
-    c = await _create(async_client, i=12, first_name="Carl", last_name="Anders", email="a@example.com")
+    """
+    a = await _create(
+        async_client, i=10, first_name="Alex", last_name="Miller", email="b@example.com"
+    )
+    b = await _create(
+        async_client, i=11, first_name="Bea", last_name="Anders", email="c@example.com"
+    )
+    c = await _create(
+        async_client, i=12, first_name="Carl", last_name="Anders", email="a@example.com"
+    )
 
     # name:asc → last_name, first_name ascending → Anders (Bea), Anders (Carl), Miller (Alex)
     r = await async_client.get("/students", params={"sort": "name:asc", "limit": 3, "offset": 0})
     assert r.status_code == 200
-    names = [(s["last_name"], s["first_name"]) for s in r.json() if s["id"] in {a["id"], b["id"], c["id"]}]
+    names = [
+        (s["last_name"], s["first_name"])
+        for s in r.json()
+        if s["id"] in {a["id"], b["id"], c["id"]}
+    ]
     # Filter to these three only and compare order
     # Full list may include others created by other tests; we sort our subset for expected order
     expected = [("Anders", "Bea"), ("Anders", "Carl"), ("Miller", "Alex")]
     assert sorted(names) == expected  # ensure content
     # Also check relative order by querying with q filter to limit set
     r = await async_client.get("/students", params={"q": "Anders", "sort": "name:asc"})
-    assert [(s["last_name"], s["first_name"]) for s in r.json()] == [("Anders", "Bea"), ("Anders", "Carl")]
+    assert [(s["last_name"], s["first_name"]) for s in r.json()] == [
+        ("Anders", "Bea"),
+        ("Anders", "Carl"),
+    ]
 
     # email:descending order among the three → c@, b@, a@
     r = await async_client.get("/students", params={"sort": "email:desc"})
@@ -153,12 +173,13 @@ async def test_sort_by_name_and_email(async_client):
     emails = [s["email"] for s in got]
     assert sorted(emails, reverse=True) == emails  # desc order
 
+
 @pytest.mark.asyncio
 async def test_default_sort_is_newest_first(async_client):
     """Test default sort order returns newest students first.
-    
+
     Verifies that without explicit sort parameter, the /students endpoint returns records in descending creation order (newest first).
-    
+
     Test Setup
         Student 1 created first (i-21)
         Student 2 created second (i-22)
@@ -169,16 +190,17 @@ async def test_default_sort_is_newest_first(async_client):
 
     Args
         async_client: Configured httpx AsyncClient fixture for API requests
-    
-    Asserts 
+
+    Asserts
         Request returns 200 status.
         Most recently created student (s2) appears first in results.
-"""
-    s1 = await _create(async_client, i=21)
+    """
+    _s1 = await _create(
+        async_client, i=21
+    )  # "_" in _s1 is used to fix a ruff flag since s1 isn't being called at the moment.
     s2 = await _create(async_client, i=22)
     r = await async_client.get("/students", params={"limit": 2})
     assert r.status_code == 200
     ids = [row["id"] for row in r.json()[:2]]
     # Default is created_at desc (or id desc fallback), so s2 should come before s1
     assert ids[0] == s2["id"]
-

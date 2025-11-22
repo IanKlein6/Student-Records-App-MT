@@ -1,11 +1,11 @@
 # backend/app/routers/router_student.py
- 
+
 """Student FastAPI router.
 
-Routes in and out going requests for student data. 
+Routes in and out going requests for student data.
 
 Routers
-    create_student (POST): 
+    create_student (POST):
     get_student_by_id (GET):
     list_students (GET):
     patch_student (PATCH):
@@ -16,17 +16,25 @@ Routers
 Notes
 
 Info data pipeline
-    Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database. 
+    Frontend <--JSON--> FastApi Router <--Pydantic Schema (data validation)--> Service Layer <--Tortoise ORM models--> Database.
 """
 
 import logging
-from typing import Optional, List
-from fastapi import APIRouter, Path, Query, HTTPException, Response, Body
+from typing import List, Optional
+
+from fastapi import APIRouter, Body, HTTPException, Path, Query, Response
 from tortoise.exceptions import IntegrityError
 from tortoise.expressions import Q
 
 from backend.app.models.model_student import Student, StudentStatus
-from backend.app.schemas.schema_student import StudentCreate, StudentPatch, StudentRead, StudentList, ArchiveRequest, RestoreRequest
+from backend.app.schemas.schema_student import (
+    ArchiveRequest,
+    RestoreRequest,
+    StudentCreate,
+    StudentList,
+    StudentPatch,
+    StudentRead,
+)
 from backend.app.services.service_student import create_student_service
 
 logger = logging.getLogger(__name__)
@@ -34,7 +42,8 @@ logger = logging.getLogger(__name__)
 # API router variable
 router = APIRouter(prefix="/students", tags=["students"])
 
-## add global error handlers at a later point in time when needed to keep routers thin and keep error handlers centralized. 
+
+## add global error handlers at a later point in time when needed to keep routers thin and keep error handlers centralized.
 @router.post("", response_model=StudentRead, status_code=201)
 async def create_student(payload: StudentCreate, response: Response):
     """Create a new student API.
@@ -44,53 +53,57 @@ async def create_student(payload: StudentCreate, response: Response):
     #### Args
         payload: Validated student creation data.
         response: FastAPI response object for setting headers.
-    
+
     #### Returns
         The newly created student record.
 
-    #### Raises 
+    #### Raises
         HTTPException: 422 if semester_id is invalid.
         HTTPException: 409 if email already exists.
 
-    #### Process 
+    #### Process
         - Accepts the validated request body (payload).
         - Pass the payload to the service layer (create_student_service) for creation.
         - Set a Location header pointing to the new resource (/students/{id}).
         - Return the created student serialized as StudentRead with status code 201.
     """
-    student = await create_student_service(payload)        
+    student = await create_student_service(payload)
     response.headers["Location"] = f"/students/{student.id}"
     return StudentRead.model_validate(student, from_attributes=True)
+
 
 @router.get("/{student_id}", response_model=StudentRead)
 async def get_student_by_id(student_id: int = Path(..., ge=1)):
     """Retrieves student by ID API.
-    
-    Handles GET requests of students from the frontend. 
-    
+
+    Handles GET requests of students from the frontend.
+
     #### Process
         - Gets GET request with wanted student ID.
         - Awaits till student is found.
         - If not found raises 404 error.
-        - If it does find the student it pass the payload student to the frontend. 
+        - If it does find the student it pass the payload student to the frontend.
     """
     student = await Student.get_or_none(id=student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     return StudentRead.model_validate(student, from_attributes=True)
 
+
 @router.get("", response_model=List[StudentList])
 async def list_students(
     semester_id: Optional[int] = Query(None, ge=1),
     status: Optional[str] = Query(None, pattern="^(active|archived|failout)$"),
     q: Optional[str] = Query(None, min_length=1),  # ILIKE on first/last name
-    sort: Optional[str] = Query(None, pattern="^(name|first_name|last_name|email|created_at):(asc|desc)$"),
+    sort: Optional[str] = Query(
+        None, pattern="^(name|first_name|last_name|email|created_at):(asc|desc)$"
+    ),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
     """Retrieve a filtered and sorted list of students.
 
-    #### Args 
+    #### Args
         semester_id: Filter by semester ID.
         status: Filter by status - 'active', 'archive', or 'failout'.
         q: Search term for first name, last name, or email (case-insensitive partial match).
@@ -105,7 +118,7 @@ async def list_students(
         400: Unsupported sort Field
 
     #### Process
-        - Initialize query for all students. 
+        - Initialize query for all students.
         - Apply semester filter if semester_id is provided.
         - Apply status filter if status if provided (map string to StudentStatus enum).
         - Apply search filter if a search query is provided (sorts across first_name, last_name, email).
@@ -118,7 +131,7 @@ async def list_students(
 
     #### Example
         GET /students?semester_id=5&status=active&q=john&sort=last_name:asc&limit=25
-        
+
     """
     qs = Student.all()
     # filters (combinable)
@@ -134,23 +147,24 @@ async def list_students(
         qs = qs.filter(status=status_map[status])
 
     if q:
-        qs = qs.filter(Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q))
+        qs = qs.filter(
+            Q(first_name__icontains=q) | Q(last_name__icontains=q) | Q(email__icontains=q)
+        )
 
     # sorting
     has_created = "created_at" in Student._meta.fields_map
     if not sort:
-        ## Debate changing to alphabetical sorting of last name for default... 
-        order_fields = ["-created_at"] if has_created else ["-id"]  # default 
+        ## Debate changing to alphabetical sorting of last name for default...
+        order_fields = ["-created_at"] if has_created else ["-id"]  # default
     else:
         field, direction = sort.split(":")
         desc = direction == "desc"
 
         if field == "name":
-            order_fields = (["-last_name", "-first_name"] if desc
-                            else ["last_name", "first_name"])
+            order_fields = ["-last_name", "-first_name"] if desc else ["last_name", "first_name"]
         elif field in ("first_name", "last_name", "email"):
             order_fields = [f"-{field}" if desc else field]
-        elif field == "created_at": 
+        elif field == "created_at":
             key = "created_at" if has_created else "id"
             order_fields = [f"-{key}" if desc else key]
         else:
@@ -181,7 +195,7 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
         2. Raise 404 error if student doesn't exist
         3. Validate that at least one field is provided in payload
         4. Check if new email conflicts with existing student emails
-        5. Update provided fields (first_name, last_name, email, notes, 
+        5. Update provided fields (first_name, last_name, email, notes,
         group_id, semester_id, work_student_potential)
         6. Handle status changes:
             - Archive student if status set to ARCHIVED
@@ -193,7 +207,7 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
     #### Example
         PATCH /students/123
         Body: {"first_name": "John", "email": "john@example.com"}
-      """
+    """
     student = await Student.get_or_none(id=student_id)
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -234,23 +248,26 @@ async def patch_student(student_id: int, payload: StudentPatch = Body(...)):
     try:
         await student.save()
     except IntegrityError:
-        raise HTTPException(status_code=409, detail="Email already exists") ## Doubled up error code??? above is a 409 already inside the loop. 
+        raise HTTPException(
+            status_code=409, detail="Email already exists"
+        )  ## Doubled up error code??? above is a 409 already inside the loop.
 
     return StudentRead.model_validate(student, from_attributes=True)
+
 
 @router.post("/{student_id}/archive", status_code=204)
 async def archive_student(student_id: int, body: ArchiveRequest = Body(default=ArchiveRequest())):
     """Archive a Student.
-    
+
     Archive a student there by removing them from the active list while preserving their data.
 
     #### Args
         student_id: Unique identifier for the student to restore.
         body: Archive request with optional reason body.
-    
+
     #### Return
-        Success response. 
-    
+        Success response.
+
     #### Raises
         404: Student not found.
 
@@ -260,7 +277,7 @@ async def archive_student(student_id: int, body: ArchiveRequest = Body(default=A
         3. Call archive method with provided reason.
         4. Return 204 No Content status confirming the move.
 
-    #### Example 
+    #### Example
         POST /students/123/archive.
         Body: {"reason": "Passed"}.
     """
@@ -270,19 +287,20 @@ async def archive_student(student_id: int, body: ArchiveRequest = Body(default=A
     await student.archive(body.reason)
     return Response(status_code=204)
 
+
 @router.post("/{student_id}/restore", status_code=204)
 async def restore_student(student_id: int, body: RestoreRequest = Body(default=RestoreRequest())):
     """Restore a student from Archive.
-    
-    Restore a student from being in the Archive making them visible in the active lists again. 
 
-    #### Args 
+    Restore a student from being in the Archive making them visible in the active lists again.
+
+    #### Args
         student_id: Unique identifier for the student to restore.
         body: RestoreRequest containing optional reason for restoration.
-    
+
     #### Returns
         Success response.
-    
+
     #### Raises
         404: Student not found.
 
@@ -291,7 +309,7 @@ async def restore_student(student_id: int, body: RestoreRequest = Body(default=R
         2. Raise 404 if student doesn't exist.
         3. Call restore method with provided reason.
         4. Return 204 No Content status.
-    
+
     #### Example
         POST: /students/123/restore
         Body: {"reason": "Re-enrolled for new semester"}
@@ -302,21 +320,22 @@ async def restore_student(student_id: int, body: RestoreRequest = Body(default=R
     await student.restore(body.reason)
     return Response(status_code=204)
 
+
 @router.api_route("/{student_id}", methods=["DELETE"], include_in_schema=False)
 async def delete_student_public(student_id: int = Path(..., ge=1)):
     """Permanent Deletion of a Student (disabled for user : enabled for admin).
-    
-    This endpoint is intentionally disabled to prevent accidental permanent data loss. Use the archive endpoint instead to soft-delete students. Only Admins are able to hard delete records. 
-    
-    #### Args 
+
+    This endpoint is intentionally disabled to prevent accidental permanent data loss. Use the archive endpoint instead to soft-delete students. Only Admins are able to hard delete records.
+
+    #### Args
         student_id: Unique identifier for the student (not used).
-    
+
     #### Return
         Never returns successfully - always raises 404.
-    
+
     #### Raises
         404: Always raised - deletion is disabled for safety.
-    
+
     #### Note
         This endpoint is hidden from API documentation (include_in_schema=False).
         Permanent deletion should only be done through admin tools or database access.

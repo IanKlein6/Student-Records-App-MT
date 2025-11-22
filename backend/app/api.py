@@ -15,22 +15,26 @@ Database Models
 """
 
 import os
+
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
-from backend.app.routers.router_student import router as students_router
+
 from backend.app.routers.router_admin import router as admin_router
+from backend.app.routers.router_student import router as students_router
 
 TESTING = os.getenv("TESTING") == "1"
 
 app = FastAPI(title="Student Records API")
 
+
 @app.get("/")
 async def health():
     return {"message": "OK"}
 
+
 # Register routers
-app.include_router(students_router) 
-app.include_router(admin_router)    
+app.include_router(students_router)
+app.include_router(admin_router)
 
 # Database configs (skip during testing)
 if not TESTING:
@@ -39,9 +43,9 @@ if not TESTING:
         db_url=os.getenv("DATABASE_URL"),
         modules={
             "models": [
-                "app.models.student", ## Might have to add backend. to the beginning of all of them to make it work right??? 
-                "app.models.group", 
-                "app.models.semester", 
+                "app.models.student",  ## Might have to add backend. to the beginning of all of them to make it work right???
+                "app.models.group",
+                "app.models.semester",
                 "app.models.archive_log",
             ]
         },

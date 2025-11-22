@@ -12,7 +12,7 @@ TORTOISE_ORM = {
                 "app.models.student",
                 "app.models.group",
                 "app.models.semester",
-                "aerich.models",   # required
+                "aerich.models",  # required
             ],
             "default_connection": "default",
         },

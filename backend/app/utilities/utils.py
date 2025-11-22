@@ -11,6 +11,7 @@ Utilities:
 """
 
 from typing import Annotated, Optional
+
 from pydantic import EmailStr, StringConstraints
 from pydantic.functional_validators import BeforeValidator
 
@@ -26,10 +27,12 @@ Str255 = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, m
 Checks that a string has a length of max 255, min length of 1, and strips all white spaces.
 """
 
-## Maybe add domain enforcement to email?? 
+
+## Maybe add domain enforcement to email??
 def _normalize_email(v: Optional[str]) -> Optional[str]:
     """Normalize email string to lowercase and trim whitespaces."""
     return v.strip().lower() if isinstance(v, str) else v
+
 
 NormalizedEmail = Annotated[EmailStr, BeforeValidator(_normalize_email)]
 """EmailStr that is automatically normalized using _normalize_email."""

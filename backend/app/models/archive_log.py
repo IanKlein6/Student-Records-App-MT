@@ -1,11 +1,14 @@
 from enum import Enum
+
 from tortoise import fields
 from tortoise.models import Model
+
 
 class ArchiveAction(str, Enum):
     SOFT_ARCHIVE = "soft_archive"
     RESTORE = "restore"
     HARD_DELETE = "hard_delete"
+
 
 class ArchiveLog(Model):
     id = fields.IntField(pk=True)

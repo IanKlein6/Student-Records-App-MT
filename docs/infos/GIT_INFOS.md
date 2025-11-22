@@ -1,4 +1,4 @@
-# SIMPLE Git — One-Page 
+# SIMPLE Git — One-Page
 
 # New Branch
     git checkout main
@@ -7,7 +7,7 @@
     git push -u origin dev
 
 # New Feature
-    git switch -c feature/my-feature 
+    git switch -c feature/my-feature
         or git branch -c feature/my-feature if you don't want to switch right away
     git add -A
     git commit -m "feat(scope): message"
@@ -51,7 +51,7 @@
 
 # Delete Branch
     # Safe delete: only when all commits are made
-    git branch -d branch_name 
+    git branch -d branch_name
     # Force delete
     git branch -D branch_name
 
@@ -245,13 +245,13 @@
     schema
 
 ### Example
-        feat(appointments): add slot-booking logic with email trigger  
-        fix(groups): prevent group creation without semester  
-        docs(devlog): log database schema decisions  
-        refactor(schema): rename trials to exam_attempt_evaluation  
-        test(api): add test for student creation endpoint  
-        infra(docker): add PostgreSQL service to docker-compose  
-        chore(lint): add pre-commit hook for formatting  
+        feat(appointments): add slot-booking logic with email trigger
+        fix(groups): prevent group creation without semester
+        docs(devlog): log database schema decisions
+        refactor(schema): rename trials to exam_attempt_evaluation
+        test(api): add test for student creation endpoint
+        infra(docker): add PostgreSQL service to docker-compose
+        chore(lint): add pre-commit hook for formatting
 
 ---
 

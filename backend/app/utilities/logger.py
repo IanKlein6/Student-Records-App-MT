@@ -2,9 +2,9 @@
 
 """Logger Configs.
 
-Configuration and centralizing of loggers to help keep logging simple, readable and in one place. 
+Configuration and centralizing of loggers to help keep logging simple, readable and in one place.
 
-Loggers: 
+Loggers:
     create_logger:
     query_logger:
     delete_logger:
@@ -16,8 +16,8 @@ Info:
 """
 
 import logging
-from pathlib import Path
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 # Create logs/folder if it doesn't exist
 log_dir = Path("logs")
@@ -27,14 +27,11 @@ log_dir.mkdir(exist_ok=True)
 file_handler = RotatingFileHandler("app.log", maxBytes=1_000_000, backupCount=3)
 
 
-# Configure root logger 
+# Configure root logger
 logging.basicConfig(
-    level=logging.DEBUG, ### set to INFO or WARNING in production
+    level=logging.DEBUG,  ### set to INFO or WARNING in production
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        file_handler,
-        logging.StreamHandler()
-    ]
+    handlers=[file_handler, logging.StreamHandler()],
 )
 
 
