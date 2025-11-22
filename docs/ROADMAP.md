@@ -116,3 +116,18 @@
     - [ ] Prepare architecture and feature summary (Excalidraw or slides)
     - [ ] Clean up codebase and remove dev/debug artifacts
     - [ ] Document system structure and known limitations
+
+
+
+### Pre-Deployment Requirements
+
+Before any production deployment with real student data:
+
+1. University IT security review and approval
+2. GDPR compliance verification
+3. Penetration testing by qualified professionals
+4. Data processing agreement with university
+5. Integration with university SSO (if required)
+6. Hosting on university-approved infrastructure
+7. Incident response plan and procedures
+8. Regular security assessment schedule
