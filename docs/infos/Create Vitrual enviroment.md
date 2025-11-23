@@ -1,38 +1,50 @@
-Step-by-Step Setup for .venv
+# Virtual Environment Setup
 
-🟩 1. Create the virtual environment in your project root
-From your terminal in the root of your project:
-
+## 1. Create the virtual environment
+From your terminal in the project root:
+```bash
 python3 -m venv .venv
+```
 This creates a hidden .venv/ folder.
 
-🟩 2. Activate the environment
+## 2. Activate the environment
+```bash
 source .venv/bin/activate
+```
 Your terminal prompt will change to something like:
-
+```
 (.venv) ianklein@MacBookAir student_records_app_mt %
+```
 Now all pip commands go into this isolated environment.
 
-🟩 3. Install your project dependencies
+## 3. Install project dependencies
+```bash
 pip install fastapi tortoise-orm uvicorn
 pip install pytest pytest-asyncio httpx
-Add anything else you use (e.g. logging libs, dotenv, etc.).
+```
+Add anything else you use (logging libs, dotenv, etc.).
 
-🟩 4. (Optional but best practice) Save dependencies to requirements.txt
+## 4. Save dependencies to requirements.txt
+```bash
 pip freeze > requirements.txt
+```
 So anyone else (or your future self) can recreate it with:
-
+```bash
 pip install -r requirements.txt
-🟩 5. (Optional) Auto-activate .venv in VSCode
+```
+
+## 5. Auto-activate in VSCode
 VSCode should detect it and ask you to use it.
 
 If it doesn't:
+- Open Command Palette: Cmd + Shift + P
+- Search: Python: Select Interpreter
+- Choose: .venv/bin/python
 
-Open Command Palette: <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>
-Search: Python: Select Interpreter
-Choose: .venv/bin/python
-✅ Final Touch: Add .venv to .gitignore
-
-You don’t want to commit your virtual environment to Git.
+## Final Touch: Add .venv to .gitignore
+You don't want to commit your virtual environment to Git.
 
 Add this line to .gitignore:
+```
+.venv/
+```
