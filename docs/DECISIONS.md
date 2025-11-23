@@ -251,3 +251,19 @@ Categories include:
   - Why: __init__.py files often import modules to expose them at the package level, even if not used within the file itself. This is a common and intentional Python pattern for creating cleaner import paths (e.g., from app.models import Student instead of from app.models.model_student import Student)
 - Scope pre-commit hooks to backend directory only
   - Why: Frontend and backend have different tooling requirements. Prevents ruff from attempting to lint frontend JavaScript/TypeScript files. Keeps hook execution fast by limiting scope to relevant files. Allows frontend to use its own linting tools (ESLint, Prettier) independently
+
+## 23/11/2025 - Documentation standards and organization
+- Standardize date format to DD/MM/YYYY across all documentation files
+  - Why: Consistent date format prevents confusion and makes documentation easier to scan. DD/MM/YYYY is more internationally recognized than US format (MM/DD/YYYY) and avoids ambiguity with mixed formats (DD-MM-YYYY, YYYY-MM-DD). Every date entry now includes a brief summary for quick reference
+- Add Structure sections to DEVLOG.md and DECISIONS.md
+  - Why: New contributors and future maintainers need clear guidelines on how to format entries. Structure section at the top provides a template and examples, ensuring consistency as the project grows. Reduces friction when making new entries
+- Consolidate documentation files and remove redundancy
+  - Why: Multiple overlapping files (schedual chatgpt.txt, Notes.txt) create confusion about where to look for information. Consolidating into focused, well-named files (project-planning-notes.md, Notes.txt) with clear purposes makes documentation more discoverable and maintainable
+- Remove emojis from documentation files
+  - Why: Emojis can cause rendering issues in different editors and terminals, don't add semantic value, and make documentation look less professional. Plain text with clear structure is more accessible and version-control friendly
+- Keep documentation casual but organized
+  - Why: Documentation should reflect the solo developer context and feel approachable, but still be structured enough to be useful when returning after breaks or for future collaboration. Balances personality with professionalism
+- Simplify git documentation from 280 to 135 lines
+  - Why: Original version had extensive duplication with commands repeated in multiple sections. Developers reference documentation for quick lookups, not comprehensive tutorials. Focused content organized by task (Daily Workflow, Common Commands, etc.) is faster to navigate
+- Create separate TODO.md for current tasks vs ROADMAP.md for long-term planning
+  - Why: Mixing current sprint tasks with long-term roadmap creates clutter. TODO.md tracks immediate work (Current Sprint, Backlog, Blocked), while ROADMAP.md maintains the big picture. Different cadences - TODO updates daily/weekly, ROADMAP rarely changes

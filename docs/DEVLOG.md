@@ -351,3 +351,31 @@ Each entry should follow this format:
   - Cleaned up docker-compose.yml formatting
   - Updated multiple documentation files in docs/infos/ directory
   - Reformatted .env.example and excalidraw diagram file
+
+## 23/11/2025 - Documentation restructure and cleanup
+- Restructured DEVLOG.md and DECISIONS.md for consistency
+  - Converted all dates to DD/MM/YYYY format (was mix of DD-MM-YYYY, DD/MM/YYYY, YYYY-MM-DD)
+  - Added brief summary after each date (## DD/MM/YYYY - Summary)
+  - Added Structure section at top of both files defining the format
+  - Removed merge conflict markers from both files
+  - Made bullet point formatting consistent throughout
+  - All content preserved, just reorganized for clarity
+- Cleaned up documentation files in docs/ and docs/infos/
+  - TODO.md: Created simple task list with Current Sprint, Backlog, Blocked, and Done sections
+  - ROADMAP.md: Streamlined phases, removed redundancy, kept 10 phases but more concise
+  - Create Virtual Environment.md: Removed emojis, improved code block formatting, clearer step-by-step instructions
+  - DOC_EXPLAINED.md: Simplified structure, clear examples for each doc type
+  - GIT_INFOS.md: Reduced from 280 lines to 135 lines, removed redundancy, organized into clear sections (Daily Workflow, Common Commands, Merge Conflicts, Cherry-pick, Commit Message Format, Branch Strategy)
+  - REENTRY.md: Added quick start commands for backend (poetry shell, uvicorn, pytest)
+  - Notes.txt: Cleaned up tech stack formatting, added brief explanations for key choices
+  - project-planning-notes.md: New file consolidating early planning notes from "schedual chatgpt.txt"
+- Removed old planning file "schedual chatgpt.txt" (replaced by project-planning-notes.md)
+- Added entries for Nov 22 work to both DEVLOG.md and DECISIONS.md
+  - Pre-commit hooks setup
+  - Ruff configuration
+  - Type hints addition
+  - detect-secrets integration
+  - Documentation updates
+- Resolved merge conflicts in doc/devlogs branch
+  - Helped with __pycache__ file conflicts during merge from main
+  - Helped with ROADMAP.md conflict resolution
