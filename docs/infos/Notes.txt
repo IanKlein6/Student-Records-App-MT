@@ -1,16 +1,18 @@
-Notes:
-Layer	Technology
-Frontend	React + Tailwind CSS
-Backend	FastAPI, Python, pydantic
-Database	PostgreSQL, TortoiseORM, Aerich
-Auth (later)	Firebase Auth
-Email	SendGrid (for now)
-Calendar API	Google Calendar API
-Hosting	Local → Docker → (e.g. Fly.io or university system)
-Dev Tools:	pytest, Docker, dotenv, pre-commit, linters
-Package manager: poetry
-ORM: TortoiseORM
+# Quick Notes
 
-pstgresql used beacuse its more modern and good at scaling for future proofing
+## Tech Stack
+- Frontend: React + Tailwind CSS
+- Backend: FastAPI (Python) + Pydantic
+- Database: PostgreSQL + TortoiseORM + Aerich
+- Package manager: Poetry
+- Auth (later): Firebase Auth
+- Email: SendGrid
+- Calendar: Google Calendar API
+- Hosting: Local → Docker → Fly.io or university system
+- Dev Tools: pytest, Docker, dotenv, pre-commit, ruff
 
-using poetry: steeper learning curve but more reliable and better for publishing. also future proofing
+## Why PostgreSQL?
+More modern and better at scaling. Good for future-proofing.
+
+## Why Poetry?
+Steeper learning curve but more reliable and better for publishing packages. Future-proofing.

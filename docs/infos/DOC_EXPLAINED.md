@@ -1,27 +1,55 @@
+# Documentation Structure
 
-DECISIONS.md = Why is it structured this way?
-DEVLOG.md = What did you change in the structure today?
-ARCHITECTURE.md (optional) = What does the current structure look like?
-README.md = High-level overview for new devs or your future self
+## What goes where
 
+**DECISIONS.md** - Why is it structured this way?
+- Architectural choices
+- Technology decisions
+- Naming conventions
+- Data model rules
 
-# ARCHITECTURE.md or /docs/structure.md EXAMPLE
-# Project Architecture
-## Backend Folder Structure
-- `models/`: Tortoise ORM models
-- `services/`: Business logic (retry scheduler, calendar)
-- `api/`: FastAPI routes
-- `tests/`: pytest unit and integration tests
-## Data Flow Example
-Student fails trial → retry logic triggered → slot found → appointment created → calendar synced
+**DEVLOG.md** - What did you change today?
+- Daily coding activities
+- Testing and discoveries
+- Issues encountered and solutions
+- Refactorings and cleanups
 
+**ARCHITECTURE.md** - What does the current structure look like?
+- Folder structure
+- Data flow
+- Component relationships
 
+**README.md** - High-level overview
+- For new devs or your future self
+- Quick start guide
+- Basic usage
 
-# 2. In DEVLOG.md EXAMPLE
-2025-08-03:
-- Moved calendar logic from models to services/calendar.py
-- Added error handler module
+---
 
-# 1. In DECISIONS.md EXAMPLE
+## Example Entries
+
+### DECISIONS.md
+```
 ## 2025-08-02: Structure backend into models/, services/, api/
 Rationale: Clear separation between DB schema, business logic, and route handlers.
+```
+
+### DEVLOG.md
+```
+## 2025-08-03
+- Moved calendar logic from models to services/calendar.py
+- Added error handler module
+- Fixed issue with duplicate email validation
+```
+
+### ARCHITECTURE.md
+```
+## Backend Folder Structure
+- models/: Tortoise ORM models
+- services/: Business logic (retry scheduler, calendar)
+- api/: FastAPI routes
+- tests/: pytest unit and integration tests
+
+## Data Flow Example
+Student fails trial → retry logic triggered → slot found → appointment created → calendar synced
+```

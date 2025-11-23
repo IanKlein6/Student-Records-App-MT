@@ -1,4 +1,4 @@
-# 📁 `/dev` — Development Notes & Planning
+# `/dev` — Development Notes & Planning
 
 This folder contains supporting files used during the development process. It includes logs, diagrams, and architectural decisions.
 
@@ -23,7 +23,7 @@ This folder contains supporting files used during the development process. It in
   Used inconjunction with Linear.com
 ---
 
-> 🛠️ These files are **not part of the deployed app**. They exist to support structured, well-documented development.
+> These files are **not part of the deployed app**. They exist to support structured, well-documented development.
 
 
 
