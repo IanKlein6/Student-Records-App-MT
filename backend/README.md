@@ -29,7 +29,8 @@ backend/
 │       ├── logger.py           # Logging configuration
 │       └── utils.py            # Utility functions
 ├── main.py                 # Application entry point
-├── pyproject.toml          # Poetry dependencies
+├── pyproject.toml          # l
+ dependencies
 ├── ruff.toml               # Ruff linter configuration
 └── tortoise_config.py      # Legacy Tortoise config
 

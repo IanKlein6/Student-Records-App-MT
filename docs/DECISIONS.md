@@ -242,7 +242,31 @@ Next steps
 - All tests must be async if the function is async.
     - Why: If the function is async then we want to test it in the way it was meant to be which is async.
     - Also all other tests are async so keeping with the scheme of the other tests.
-=======
-## 2025-08-03 Appointments Link Students, Technika, and Slots
-Reason: The `appointments` table serves as the source of truth for scheduling, tying together the student, technika, and time slot in one place.
->>>>>>> feature/student_model
+
+## 22.11.25
+- Use Ruff as the primary linter and formatter
+  - Why: Ruff is significantly faster than traditional Python tools (10-100x faster than Black, Flake8, isort combined). Written in Rust, it provides all-in-one linting and formatting. Consolidates multiple tools (Black, Flake8, isort, pep8-naming) into a single configuration. Growing community adoption and active development make it a future-proof choice.
+
+- Implement pre-commit hooks for automated code quality enforcement
+  - Why: Catches code quality issues before they reach the repository. Prevents commits with trailing whitespace, missing newlines, invalid YAML/JSON, or large files. Runs ruff automatically to enforce consistent code style across all commits. Reduces code review burden by catching formatting and basic errors early.
+
+- Add detect-secrets to pre-commit pipeline
+  - Why: Prevents accidental commits of API keys, passwords, tokens, and other secrets. Creates a baseline file to track known false positives. Runs automatically on every commit to scan for high-entropy strings and common secret patterns. Critical for security, especially before deploying to production or sharing repository publicly.
+
+- Adopt comprehensive type hints across the codebase
+  - Why: Enables static type checking with mypy to catch type errors before runtime. Improves IDE autocomplete and inline documentation. Makes code more maintainable by explicitly documenting expected parameter and return types. Facilitates refactoring by catching type mismatches across function calls. Aligns with modern Python best practices (PEP 484).
+
+- Set line length to 100 characters (not 88 or 120)
+  - Why: 100 characters balances readability with screen real estate. Wider than Black's default 88 (allows more code per line) but narrower than 120 (prevents horizontal scrolling on smaller screens). Works well with modern monitors and split-screen development.
+
+- Target Python 3.13 in ruff configuration
+  - Why: Specifies the exact Python version being used in the project. Ensures ruff applies appropriate syntax rules and doesn't flag valid Python 3.13 features as errors. Aligns linter with runtime environment.
+
+- Enable specific ruff rule categories (E, F, I, N, W) rather than all rules
+  - Why: Focused rule set balances code quality with pragmatism. E/W (pycodestyle) enforces PEP 8 style. F (pyflakes) catches logic errors like unused imports. I (isort) organizes imports consistently. N (pep8-naming) enforces naming conventions. Avoids overly strict rules that would require extensive codebase changes without clear benefit.
+
+- Allow unused imports in __init__.py files
+  - Why: __init__.py files often import modules to expose them at the package level, even if not used within the file itself. This is a common and intentional Python pattern for creating cleaner import paths (e.g., `from app.models import Student` instead of `from app.models.model_student import Student`).
+
+- Scope pre-commit hooks to backend directory only
+  - Why: Frontend and backend have different tooling requirements. Prevents ruff from attempting to lint frontend JavaScript/TypeScript files. Keeps hook execution fast by limiting scope to relevant files. Allows frontend to use its own linting tools (ESLint, Prettier) independently.

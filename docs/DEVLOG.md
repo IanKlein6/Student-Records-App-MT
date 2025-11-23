@@ -335,6 +335,55 @@ Pending hygiene items
 - Changed doc string scheme to include #### in front of any heading to bold them. This makes it easy to see the important parts when glancing over the docstring.
 - Fixed doc string layout problem where doc strings didn't alway appear the same when hovering over function name.
   - Fix: removed all ':' from after a heading which then allowed for consistent presentation of the doc strings.
-=======
-  - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense.
->>>>>>> feature/student_model
+
+## 22.11.25
+- Set up comprehensive pre-commit hooks for automated code quality checks
+  - Created `.pre-commit-config.yaml` with multiple hooks:
+    - Ruff linter (with --fix flag for auto-corrections)
+    - Ruff formatter (for consistent code style)
+    - trailing-whitespace removal
+    - end-of-file-fixer (ensures files end with newline)
+    - check-yaml (validates YAML syntax)
+    - check-json (validates JSON syntax)
+    - check-added-large-files (prevents files >1MB from being committed)
+    - check-merge-conflict (catches merge conflict markers)
+  - All hooks configured to run automatically on every git commit
+  - Scoped ruff hooks to `^backend/` directory only
+
+- Configured Ruff as the primary linter and formatter
+  - Created `backend/ruff.toml` configuration file
+  - Settings:
+    - Line length: 100 characters
+    - Target Python version: 3.13
+    - Enabled rule categories: E (pycodestyle errors), F (pyflakes), I (isort), N (pep8-naming), W (pycodestyle warnings)
+    - Ignored E501 (line too long) since line-length is configured
+    - Per-file ignores: F401 (unused imports) allowed in __init__.py, E501 allowed in tests
+    - Import sorting configured with known-first-party: ["app", "backend"]
+  - Ran ruff formatter across entire codebase (35 files reformatted)
+
+- Added type hints throughout the backend codebase
+  - Updated all files with proper type annotations:
+    - Models: model_student.py, archive_log.py, group.py, semester.py
+    - Schemas: schema_student.py
+    - Services: service_student.py
+    - Routers: router_student.py, router_admin.py
+    - Core: api.py, config.py, main.py
+    - Utilities: logger.py, utils.py
+    - Tests: conftest.py, test_api.py, test_students.py, test_students_filter_sorting.py
+    - Config: tortoise_config.py
+  - Added parameter types and return type hints to all functions
+  - Improved IDE autocomplete and static analysis support
+
+- Integrated detect-secrets for preventing credential leaks
+  - Added detect-secrets hook to pre-commit pipeline (v1.5.0)
+  - Generated `.secrets.baseline` file with 127 lines of baseline scan results
+  - Configured exclusions: package.lock.json, .env.example, README.md
+  - Added detect-secrets to Poetry dependencies in backend/pyproject.toml
+  - Updated poetry.lock with new dependency tree
+
+- Updated documentation and configuration files
+  - Enhanced backend/README.md with instructions for using pre-commit and code quality tools
+  - Updated .gitignore formatting
+  - Cleaned up docker-compose.yml formatting
+  - Updated multiple documentation files in docs/infos/ directory
+  - Reformatted .env.example and excalidraw diagram file
