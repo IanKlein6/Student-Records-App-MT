@@ -1,4 +1,4 @@
-# SIMPLE Git — One-Page 
+# SIMPLE Git — One-Page
 
 # New Branch
     git checkout main
@@ -7,7 +7,8 @@
     git push -u origin dev
 
 # New Feature
-    git checkout -b feature/my-feature
+    git switch -c feature/my-feature
+        or git branch -c feature/my-feature if you don't want to switch right away
     git add -A
     git commit -m "feat(scope): message"
     git push -u origin feature/my-feature
@@ -48,6 +49,13 @@
     git pull --ff-only
     git fetch --all --prune
 
+# Delete Branch
+    # Safe delete: only when all commits are made
+    git branch -d branch_name
+    # Force delete
+    git branch -D branch_name
+
+
 # Commit Types
     feat, fix, chore, docs, refactor, style, test, perf, ci, revert, infra
 
@@ -66,18 +74,18 @@
 
 # IN-DEPTH
 
-# New Branch:
+# New DEV Branch:
     # Make sure you’re on main:
-        git checkout main
+        git switch main
     # Pull the latest main just in case:
         git pull --ff-only
     # Create the dev branch from main:
-        git checkout -b dev
+        git switch -b dev
     # Push it to GitHub (so it exists remotely too):
         git push -u origin dev
 
 # Then Create Your Feature Branch
-    git checkout -b feature/add-evaluation-models
+    git switch -c feature/my_feature
     # Do your work...
     git add -A
     git commit -m "feat: add evaluation models"
@@ -237,13 +245,13 @@
     schema
 
 ### Example
-        feat(appointments): add slot-booking logic with email trigger  
-        fix(groups): prevent group creation without semester  
-        docs(devlog): log database schema decisions  
-        refactor(schema): rename trials to exam_attempt_evaluation  
-        test(api): add test for student creation endpoint  
-        infra(docker): add PostgreSQL service to docker-compose  
-        chore(lint): add pre-commit hook for formatting  
+        feat(appointments): add slot-booking logic with email trigger
+        fix(groups): prevent group creation without semester
+        docs(devlog): log database schema decisions
+        refactor(schema): rename trials to exam_attempt_evaluation
+        test(api): add test for student creation endpoint
+        infra(docker): add PostgreSQL service to docker-compose
+        chore(lint): add pre-commit hook for formatting
 
 ---
 

@@ -1,8 +1,8 @@
 Notes:
 Layer	Technology
 Frontend	React + Tailwind CSS
-Backend	FastAPI, Python, pydantic 
-Database	PostgreSQL, TortoiseORM
+Backend	FastAPI, Python, pydantic
+Database	PostgreSQL, TortoiseORM, Aerich
 Auth (later)	Firebase Auth
 Email	SendGrid (for now)
 Calendar API	Google Calendar API

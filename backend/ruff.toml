@@ -1,0 +1,29 @@
+# Ruff configuration for Student Records App
+
+# Basic settings
+line-length = 100
+target-version = "py313"
+
+# Linting rules
+[lint]
+# Select which rule categories to enable
+# E = pycodestyle errors (PEP 8 style issues)
+# F = pyflakes (logic errors like unused imports)
+# I = isort (import sorting)
+# N = pep8-naming (naming conventions)
+# W = pycodestyle warnings
+select = ["E", "F", "I", "N", "W"]
+
+# Ignore specific rules
+ignore = [
+    "E501",  # Line too long (we set line-length above instead)
+]
+
+# Per-file ignores
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Unused imports are OK in __init__.py files
+"app/tests/*" = ["E501"]  # Allow longer lines in tests
+
+# Import sorting configuration
+[lint.isort]
+known-first-party = ["app", "backend"]

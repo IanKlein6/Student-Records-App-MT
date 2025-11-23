@@ -5,7 +5,7 @@
 Reason: Decision explained why
 
 
-## 2025-07-01 
+## 2025-07-01
 - Using Tortoise ORM with FastAPI
     - Reason: Simpler integration for async Python; aligns with Poetry setup
 
@@ -20,7 +20,7 @@ Reason: Decision explained why
     - Reason: Easier to test and evolve without model bloat
 
 
-## 2025-08-01 
+## 2025-08-01
 - Rename `trials` to `exam_attempt_evaluation`
     - Reason: The term “trial” was ambiguous. The new name reflects its role as a formal record of either a protocol or oral exam attempt.
 - Scheduling is based on `availability_slots` and linked to `appointments`
@@ -31,7 +31,7 @@ Reason: Decision explained why
     - Reason: The logic for retrying is modeled in Excalidraw as decision diamonds; if max attempts aren’t reached, the student may reattempt via a new appointment.
 
 
-## 2025-08-03 
+## 2025-08-03
 - Five Core Diagrams Chosen for Initial Planning
     - Reason: To keep planning lightweight but effective, five diagrams were selected as the minimum necessary to guide backend development: ERD, Retry Flow, System Overview, Student State Lifecycle, and a Request/Response Flow. Other diagrams (email, calendar UI) will be created only as needed during development.
 - Email and Auth Integration Deferred
@@ -44,26 +44,26 @@ Reason: Decision explained why
     - Reason: Backend model design and logic will lead the project. The frontend will be built as a lightweight shell on top, with refinement, email, and security added after the logic is working.
 - Diagrams Used for Orientation, Not Exhaustiveness
     - Reason: Diagrams are for understanding and navigation — not full documentation. Unplanned diagrams will be created only when needed, allowing development to continue without over-planning.
-- Backend Role and Flow Clarified  
+- Backend Role and Flow Clarified
     - Reason: Confirmed that FastAPI is the core backend and not just middleware. Requests flow: Frontend → FastAPI → Tortoise ORM → PostgreSQL.
-- Security Layers Sketched in Architecture  
+- Security Layers Sketched in Architecture
     - Reason: Security and validation will be handled at key points in the request lifecycle: between Frontend and FastAPI (via Firebase Auth and request validation) and between FastAPI and the database (via ORM-level schema enforcement).
-- `status` Replaces `active` on Student  
+- `status` Replaces `active` on Student
     - Reason: A string-based `status` field allows for clearer state tracking (`"active"`, `"passed"`, `"failed"`) than a boolean flag.
-- Group–Student Link Moved to Separate Table  
+- Group–Student Link Moved to Separate Table
     - Reason: A separate `student_group_memberships` table better reflects the many-to-many relationship between students and groups and keeps `students` clean.
-- Attempts No Longer Store Group ID  
+- Attempts No Longer Store Group ID
     - Reason: Group affiliation is not needed at the `attempt` level since scheduling is handled through the `appointments` table. This reduces redundancy.
-- Appointments Link Students, Technika, and Slots  
+- Appointments Link Students, Technika, and Slots
     - Reason: The `appointments` table serves as the source of truth for scheduling, tying together the student, technika, and time slot in one place.
 
-## 09-08-25 
+## 09-08-25
 - Enum fields will use CharEnumField
-    - Reason: decided to use Enum because FrozenSets are not available in Tortoise. 
+    - Reason: decided to use Enum because FrozenSets are not available in Tortoise.
 - Time Stamp created in Student
     - Reason: time stamp helps see when the student was created/ when they started
 - Indexs will be meta in models
-    - Reason: meta instead of inline because simpler coding and overview. 
+    - Reason: meta instead of inline because simpler coding and overview.
 - Composite indexes
     - Reason: used when possible for indexes that are frequently searched
 
@@ -113,7 +113,7 @@ Routing Conventions
     - Decision: expose plural aliases to match spec (/students, /students/{id}) while keeping current paths for backward compatibility.
     - Rationale: aligns with REST naming without breaking existing usage.
 
-## 27-08-25 
+## 27-08-25
 - Archiving location
     - Decision: Put archive() / restore() on the Student model for now.
     - Rationale: Centralizes invariants; ergonomic calls from anywhere; easy to evolve.
@@ -217,6 +217,7 @@ Next steps
 - Validate email uniqueness via database constraints, not pre-checks
   - Why: Prevents race conditions. Pre-checking email existence then creating student creates window where another request could create same email between check and insert. Database UNIQUE constraint is atomic and authoritative.
 
+<<<<<<< HEAD
 - Keep routers thin - no try/except for HTTPException
   - Why: FastAPI automatically catches and formats HTTPException responses. Adding try/except in routers creates boilerplate and violates single responsibility. Service layer handles business logic and raises exceptions; routers just pass through.
 
@@ -237,7 +238,35 @@ Next steps
 
 ## 16.11.25
 - Rename files to include folder names schema/student.py tp schema/schema_student.py
-    - Why: Simplifies understanding which student.py does what when having multiple pages open. 
-- All tests must be async if the function is async. 
+    - Why: Simplifies understanding which student.py does what when having multiple pages open.
+- All tests must be async if the function is async.
     - Why: If the function is async then we want to test it in the way it was meant to be which is async.
-    - Also all other tests are async so keeping with the scheme of the other tests. 
+    - Also all other tests are async so keeping with the scheme of the other tests.
+
+## 22.11.25
+- Use Ruff as the primary linter and formatter
+  - Why: Ruff is significantly faster than traditional Python tools (10-100x faster than Black, Flake8, isort combined). Written in Rust, it provides all-in-one linting and formatting. Consolidates multiple tools (Black, Flake8, isort, pep8-naming) into a single configuration. Growing community adoption and active development make it a future-proof choice.
+
+- Implement pre-commit hooks for automated code quality enforcement
+  - Why: Catches code quality issues before they reach the repository. Prevents commits with trailing whitespace, missing newlines, invalid YAML/JSON, or large files. Runs ruff automatically to enforce consistent code style across all commits. Reduces code review burden by catching formatting and basic errors early.
+
+- Add detect-secrets to pre-commit pipeline
+  - Why: Prevents accidental commits of API keys, passwords, tokens, and other secrets. Creates a baseline file to track known false positives. Runs automatically on every commit to scan for high-entropy strings and common secret patterns. Critical for security, especially before deploying to production or sharing repository publicly.
+
+- Adopt comprehensive type hints across the codebase
+  - Why: Enables static type checking with mypy to catch type errors before runtime. Improves IDE autocomplete and inline documentation. Makes code more maintainable by explicitly documenting expected parameter and return types. Facilitates refactoring by catching type mismatches across function calls. Aligns with modern Python best practices (PEP 484).
+
+- Set line length to 100 characters (not 88 or 120)
+  - Why: 100 characters balances readability with screen real estate. Wider than Black's default 88 (allows more code per line) but narrower than 120 (prevents horizontal scrolling on smaller screens). Works well with modern monitors and split-screen development.
+
+- Target Python 3.13 in ruff configuration
+  - Why: Specifies the exact Python version being used in the project. Ensures ruff applies appropriate syntax rules and doesn't flag valid Python 3.13 features as errors. Aligns linter with runtime environment.
+
+- Enable specific ruff rule categories (E, F, I, N, W) rather than all rules
+  - Why: Focused rule set balances code quality with pragmatism. E/W (pycodestyle) enforces PEP 8 style. F (pyflakes) catches logic errors like unused imports. I (isort) organizes imports consistently. N (pep8-naming) enforces naming conventions. Avoids overly strict rules that would require extensive codebase changes without clear benefit.
+
+- Allow unused imports in __init__.py files
+  - Why: __init__.py files often import modules to expose them at the package level, even if not used within the file itself. This is a common and intentional Python pattern for creating cleaner import paths (e.g., `from app.models import Student` instead of `from app.models.model_student import Student`).
+
+- Scope pre-commit hooks to backend directory only
+  - Why: Frontend and backend have different tooling requirements. Prevents ruff from attempting to lint frontend JavaScript/TypeScript files. Keeps hook execution fast by limiting scope to relevant files. Allows frontend to use its own linting tools (ESLint, Prettier) independently.

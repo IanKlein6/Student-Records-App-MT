@@ -17,7 +17,7 @@ Table groups {
   scheduled_date date
   semester_id int [ref: > semesters.id]
 }
- 
+
 Table student_group_memberships {
   id int [pk, increment]
   student_id int [ref: > students.id]
@@ -194,6 +194,3 @@ Organizing by value delivered
 Would you like a basic project folder structure or a .gitignore template to kick things off cleanly?
 
 Or want help figuring out which ORM (SQLAlchemy vs Tortoise) suits your learning style better?
-
-
-

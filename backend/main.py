@@ -1,19 +1,11 @@
+# backend/main.py
 
-from fastapi import FastAPI
-from tortoise.contrib.fastapi import register_tortoise
+"""Application entry point.
 
-from tortoise_config import TORTOISE_ORM #adjust path as needed
+Run with: uvicorn main:app --reload
+"""
 
-app = FastAPI()
+if __name__ == "__main__":
+    import uvicorn
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
-
-
-register_tortoise(
-    app,
-    config=TORTOISE_ORM,
-    generate_schemas=False, #Aerich for migrations
-    add_exception_handlers=True,
-)
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)

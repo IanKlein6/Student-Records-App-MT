@@ -4,11 +4,11 @@
 
 ## DATE:
 - [ ✅ = done; ❌ = not applicable / removed; 🔲 = to-do; 🛠️ = in progress; 🔍 = under review ] Daily coding activities, testing, discoveries
-    - What you implemented, changed, or tested; 
-    - Issues encountered and how you solved or worked around them; 
-    - Rough ideas you're experimenting with; 
-    - Excalidraw diagram updates or sketches; 
-    - Refactorings or small architecture cleanups; 
+    - What you implemented, changed, or tested;
+    - Issues encountered and how you solved or worked around them;
+    - Rough ideas you're experimenting with;
+    - Excalidraw diagram updates or sketches;
+    - Refactorings or small architecture cleanups;
     - Local testing status / next steps
 
 
@@ -32,7 +32,7 @@
 
 - Next:
   - Add POST logic sketch to Excalidraw
-  - Create Linear Plan with tickets for planning faze. 
+  - Create Linear Plan with tickets for planning faze.
   - Begin implementing backend endpoints
 
 
@@ -69,9 +69,9 @@
 - Create #1 "Mini Systems Overview" of the 5 core Excalidraw diagrams:
     - mini systems overview detailing the basic overview from frontend - api - backend - DB and back. noted security checks to be added later
 - Started working on #2 "Entity Relationship Diagram" of the core drawings:
-    - Started remapping the first version of this. 
-    - Finished Student, Exam_attempt, Group adding FK/PK 
-        
+    - Started remapping the first version of this.
+    - Finished Student, Exam_attempt, Group adding FK/PK
+
 
 - Next:
   - Draw and complete the the rest of the 4 of 5 core Excalidraw diagrams
@@ -83,22 +83,23 @@
 ## 8-08-2025
 - added Work Student Potential option to student and exam attempt
   - should be 3 tiered to show how strongly they want them needs to then be a visual and search or filter students by potential
-  - added issue to Linear "Student Profile" for frontend later and to backend student + exam attempt model 
+  - added issue to Linear "Student Profile" for frontend later and to backend student + exam attempt model
   - have to do some averaging math if multiple attempts have different potential scales.
-- created semester student flow chart explain how the student and its exams move through the app 
-- drew two excali drawings 
+- created semester student flow chart explain how the student and its exams move through the app
+- drew two excali drawings
   - 1 semester student flow: logic showing the logic of how a student progresses through the app
-  - 2 semester student flow: explained. more in depth explaining of what happens in the app in regard to the student and their attempts and interaction with the examiner and scheduling. 
+  - 2 semester student flow: explained. more in depth explaining of what happens in the app in regard to the student and their attempts and interaction with the examiner and scheduling.
 - started on Diagram Request/Response Flow for critical Action
-  - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense. 
+<<<<<<< HEAD
+  - am quite confused and for as far as validation but having a hard time with the errors and where they need to go. might have to go simple and then add more as it starts to make more sense.
 
 ## 09-08-2025
 - Added Linear issues for all main models: Student, Semester, Evaluation, Appointment, Examiner, User
-  - added sub tickets covering all important points for each model including schemas, testing, migrations and documentation. 
+  - added sub tickets covering all important points for each model including schemas, testing, migrations and documentation.
 - Worked on refining the Student model
-  - Identified that FrozenSets (sets that are immutable once created) do not work for this since they are not a Tortoise ORM field. 
+  - Identified that FrozenSets (sets that are immutable once created) do not work for this since they are not a Tortoise ORM field.
     - Instead had to use CharEnumField. Creates a class with constraint options which are then added to the models field.
-  - Created two Enum classes: StudentStatus and WorkPotential with their respective options. 
+  - Created two Enum classes: StudentStatus and WorkPotential with their respective options.
   - added attempt field with int
   - added created_at to see when the profile was created
   - added meta indexes last_name and first_name for easy sorting
@@ -295,7 +296,7 @@ Pending hygiene items
 
 ## 05 to 08 -11-25
 - Added PEP 257 docstrings for review standardization
-  - Started reviewing all Student model, service layer, schema, and router  to add docstrings for PEP 257 compliance and readability 
+  - Started reviewing all Student model, service layer, schema, and router  to add docstrings for PEP 257 compliance and readability
   - Standardized format: imperative mood for summaries, proper Args/Returns/Raises sections
   - Added "Configuration" sections to Pydantic schemas documenting model_config settings (extra="forbid")
   - Clarified process documentation in service layer functions while maintaining PEP 257 structure
@@ -328,9 +329,61 @@ Pending hygiene items
 - Added doc strings to schema_students, model_students, service_student, main, api, router_admin, conftest, logger.
 - renamed several files to include their folder name plus their function name e.i. services/student.py to services/service_student.py
   - Reason: naming scheme allows for better over view when having lots of tabs open being able to see which student.py actually does what.
-- renamed app/main.py to api.py because there are were two mains. One in backend/main.py and one in backend/app/main.py. app/main.py is also for apis so called it api. 
+- renamed app/main.py to api.py because there are were two mains. One in backend/main.py and one in backend/app/main.py. app/main.py is also for apis so called it api.
 - Refactored test structure in test_api.py to use async
-  - Reason: All other tests are using async as well as the functions their are testing are all async, thus it makes sense to change it for consistence and since the function should be tested exactly the way the function has also be created. 
-- Changed doc string scheme to include #### in front of any heading to bold them. This makes it easy to see the important parts when glancing over the docstring. 
+  - Reason: All other tests are using async as well as the functions their are testing are all async, thus it makes sense to change it for consistence and since the function should be tested exactly the way the function has also be created.
+- Changed doc string scheme to include #### in front of any heading to bold them. This makes it easy to see the important parts when glancing over the docstring.
 - Fixed doc string layout problem where doc strings didn't alway appear the same when hovering over function name.
   - Fix: removed all ':' from after a heading which then allowed for consistent presentation of the doc strings.
+
+## 22.11.25
+- Set up comprehensive pre-commit hooks for automated code quality checks
+  - Created `.pre-commit-config.yaml` with multiple hooks:
+    - Ruff linter (with --fix flag for auto-corrections)
+    - Ruff formatter (for consistent code style)
+    - trailing-whitespace removal
+    - end-of-file-fixer (ensures files end with newline)
+    - check-yaml (validates YAML syntax)
+    - check-json (validates JSON syntax)
+    - check-added-large-files (prevents files >1MB from being committed)
+    - check-merge-conflict (catches merge conflict markers)
+  - All hooks configured to run automatically on every git commit
+  - Scoped ruff hooks to `^backend/` directory only
+
+- Configured Ruff as the primary linter and formatter
+  - Created `backend/ruff.toml` configuration file
+  - Settings:
+    - Line length: 100 characters
+    - Target Python version: 3.13
+    - Enabled rule categories: E (pycodestyle errors), F (pyflakes), I (isort), N (pep8-naming), W (pycodestyle warnings)
+    - Ignored E501 (line too long) since line-length is configured
+    - Per-file ignores: F401 (unused imports) allowed in __init__.py, E501 allowed in tests
+    - Import sorting configured with known-first-party: ["app", "backend"]
+  - Ran ruff formatter across entire codebase (35 files reformatted)
+
+- Added type hints throughout the backend codebase
+  - Updated all files with proper type annotations:
+    - Models: model_student.py, archive_log.py, group.py, semester.py
+    - Schemas: schema_student.py
+    - Services: service_student.py
+    - Routers: router_student.py, router_admin.py
+    - Core: api.py, config.py, main.py
+    - Utilities: logger.py, utils.py
+    - Tests: conftest.py, test_api.py, test_students.py, test_students_filter_sorting.py
+    - Config: tortoise_config.py
+  - Added parameter types and return type hints to all functions
+  - Improved IDE autocomplete and static analysis support
+
+- Integrated detect-secrets for preventing credential leaks
+  - Added detect-secrets hook to pre-commit pipeline (v1.5.0)
+  - Generated `.secrets.baseline` file with 127 lines of baseline scan results
+  - Configured exclusions: package.lock.json, .env.example, README.md
+  - Added detect-secrets to Poetry dependencies in backend/pyproject.toml
+  - Updated poetry.lock with new dependency tree
+
+- Updated documentation and configuration files
+  - Enhanced backend/README.md with instructions for using pre-commit and code quality tools
+  - Updated .gitignore formatting
+  - Cleaned up docker-compose.yml formatting
+  - Updated multiple documentation files in docs/infos/ directory
+  - Reformatted .env.example and excalidraw diagram file

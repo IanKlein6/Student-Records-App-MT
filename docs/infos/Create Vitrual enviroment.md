@@ -36,4 +36,3 @@ Choose: .venv/bin/python
 You don’t want to commit your virtual environment to Git.
 
 Add this line to .gitignore:
-

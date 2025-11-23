@@ -1,3 +1,5 @@
+# backend/app/config.py
+
 import os
 
 TORTOISE_ORM = {
@@ -8,9 +10,11 @@ TORTOISE_ORM = {
         "models": {
             "models": [
                 "app.models.student",
-                "app.models.archive_logaerich.models",
+                "app.models.group",
+                "app.models.semester",
+                "aerich.models",  # required
             ],
             "default_connection": "default",
-        }
+        },
     },
 }
