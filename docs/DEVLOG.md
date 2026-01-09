@@ -368,8 +368,8 @@ Each entry should follow this format:
   - GIT_INFOS.md: Reduced from 280 lines to 135 lines, removed redundancy, organized into clear sections (Daily Workflow, Common Commands, Merge Conflicts, Cherry-pick, Commit Message Format, Branch Strategy)
   - REENTRY.md: Added quick start commands for backend (poetry shell, uvicorn, pytest)
   - Notes.txt: Cleaned up tech stack formatting, added brief explanations for key choices
-  - project-planning-notes.md: New file consolidating early planning notes from "schedual chatgpt.txt"
-- Removed old planning file "schedual chatgpt.txt" (replaced by project-planning-notes.md)
+  - project-planning-notes.md: New file consolidating early planning notes from "schedule chatgpt.txt"
+- Removed old planning file "schedule chatgpt.txt" (replaced by project-planning-notes.md)
 - Added entries for Nov 22 work to both DEVLOG.md and DECISIONS.md
   - Pre-commit hooks setup
   - Ruff configuration
@@ -379,3 +379,4 @@ Each entry should follow this format:
 - Resolved merge conflicts in doc/devlogs branch
   - Helped with __pycache__ file conflicts during merge from main
   - Helped with ROADMAP.md conflict resolution
+- Main branch updated with all branches. Will start new students branch.
