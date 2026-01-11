@@ -39,15 +39,34 @@ Fixtures
 import pytest
 
 
-# 200: GET existing
+# Create student in memory for testing below
+async def _create(async_client, first_name, last_name, email):
+    """Helper to create a student. Requires all fields explicitly."""
+    r = await async_client.post(
+        "/students", json={"first_name": first_name, "last_name": last_name, "email": email}
+    )
+    assert r.status_code == 201, r.text
+    return r.json()
+
+
+# 200: GET existing by ID
 @pytest.mark.asyncio
 async def test_get_student_200(async_client):
-    s = await _create(async_client, email="get200@test.com")
+    s = await _create(async_client, first_name="John", last_name="Doe", email="get@test.com")
     r = await async_client.get(f"/students/{s['id']}")
     assert r.status_code == 200
     data = r.json()
     assert data["id"] == s["id"]
     assert data["email"] == "get200@test.com"
+    assert data["first_name"] == "John"
+    assert data["last_name"] == "Doe"
+
+
+# 404: GET non-existent
+@pytest.mark.asyncio
+async def test_get_student_404(async_client):
+    r = await async_client.get("/students/999999")
+    assert r.status_code == 404
 
 
 # 200: PATCH existing (update first_name)
@@ -59,6 +78,13 @@ async def test_patch_student_200(async_client):
     data = r.json()
     assert data["id"] == s["id"]
     assert data["first_name"] == "New"
+
+
+# 404: PATCH non-existent
+@pytest.mark.asyncio
+async def test_patch_student_404(async_client):
+    r = await async_client.patch("/students/999999", json={"first_name": "New"})
+    assert r.status_code == 404
 
 
 # 422: missing required fields
@@ -75,20 +101,6 @@ async def test_create_student_422_bad_email(async_client):
         "/students", json={"first_name": "A", "last_name": "B", "email": "not-an-email"}
     )
     assert r.status_code == 422
-
-
-# 404: GET non-existent
-@pytest.mark.asyncio
-async def test_get_student_404(async_client):
-    r = await async_client.get("/students/999999")
-    assert r.status_code == 404
-
-
-# 404: PATCH non-existent
-@pytest.mark.asyncio
-async def test_patch_student_404(async_client):
-    r = await async_client.patch("/students/999999", json={"first_name": "New"})
-    assert r.status_code == 404
 
 
 # 404 DELETE non-existent
@@ -168,15 +180,6 @@ async def test_create_student_location(async_client):
     # Extract id and check its's an int-like string
     student_id = location.rsplit("/", 1)[-1]
     assert student_id.isdigit()
-
-
-# Create student in memory for testing below
-async def _create(async_client, first="Alex", last="Heartt", email="alex@test.com"):
-    r = await async_client.post(
-        "/students", json={"first_name": first, "last_name": last, "email": email}
-    )
-    assert r.status_code == 201, r.text
-    return r.json()
 
 
 # Archive + restore flow
