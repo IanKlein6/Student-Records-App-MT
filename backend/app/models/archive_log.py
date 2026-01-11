@@ -11,7 +11,7 @@ class ArchiveAction(str, Enum):
 
 
 class ArchiveLog(Model):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(primary_key=True)
     # Keep logs even if the Student is hard-deleted
     student = fields.ForeignKeyField(
         "models.Student",
