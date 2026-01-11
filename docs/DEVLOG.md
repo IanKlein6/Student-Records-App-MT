@@ -380,3 +380,29 @@ Each entry should follow this format:
   - Helped with __pycache__ file conflicts during merge from main
   - Helped with ROADMAP.md conflict resolution
 - Main branch updated with all branches. Will start new students branch.
+
+## 10/01/2026 - Github commit error and Testing error
+- Staging issue. Old file not staged which created a git commit error.
+  - Fixed spelling
+  - Fix = Staging second file that hadn't been staged yet.
+- Changing all import file paths from backend.app.api… to just app.api…
+  - To alle import paths with fastapi structure.
+
+## 11/01/2026 - Fix student tests
+- Fix: Non running tests
+  - Corrected wrong naming of import model_student in config and conftest.
+- Chore: Workspace creation
+  - created two separate workspaces with separate git branches
+    - created extra work-tree folder for docs and a workspace linked to that work-tree.
+  - created script for auto opening both workspaces with one click.
+    - Allows access of docs branch and dev branch simultaneously
+- Fix: 2 failed test ARCHIVE
+  - archive_log.py had naming scheme of ARCHIVE. was SOFT_ARCHIVE while rest of application was were calling ARCHIVE. Removed SOFT.
+- Fix: Warning pk depreciation.
+  - archive_log.py was still using pk=True instead of primary_key=True
+- Feat: created test_population.py for easy test populating with complex datasets.
+- Refactor: changing tests from using a student creator, which just adds obscurity without function, to use inline data unless they need big datasets.
+
+- ToDo:
+  - change all tests to use inline data while still using _create.
+  - see if all test errors get fixed that have now been created with this refactoring.

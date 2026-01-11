@@ -267,3 +267,8 @@ Categories include:
   - Why: Original version had extensive duplication with commands repeated in multiple sections. Developers reference documentation for quick lookups, not comprehensive tutorials. Focused content organized by task (Daily Workflow, Common Commands, etc.) is faster to navigate
 - Create separate TODO.md for current tasks vs ROADMAP.md for long-term planning
   - Why: Mixing current sprint tasks with long-term roadmap creates clutter. TODO.md tracks immediate work (Current Sprint, Backlog, Blocked), while ROADMAP.md maintains the big picture. Different cadences - TODO updates daily/weekly, ROADMAP rarely changes
+
+## 11/01/2026 - Testing data
+- Separate population data for testing
+  - Decided against this and for keeping testing data inline in each test allowing more flexibility for specific testing cases and simplicity
+  - Can however be changed at a future date if so needed.

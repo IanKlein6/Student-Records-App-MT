@@ -48,3 +48,37 @@ Add this line to .gitignore:
 ```
 .venv/
 ```
+
+
+
+# Pytest Commands:
+Can be done with python3 -m instead of poetry run as well.
+
+## Run with verbose output
+poetry run pytest -v
+
+## Run a specific test file
+poetry run pytest app/tests/test_students.py
+
+## Run a specific test function
+poetry run pytest app/tests/test_students.py::test_archive_then_restore
+
+## Stop at first failure
+poetry run pytest -x
+
+
+
+# Coverage testing checker
+## To get a cleaner report focused on your app:
+  poetry run coverage run --source=app -m pytest
+  poetry run coverage report
+
+## Better experience with HTML output:
+  poetry run coverage run --source=app -m pytest
+  poetry run coverage html
+  open htmlcov/index.html
+
+## Pytest-cov (recommended):
+  poetry add --group dev pytest-cov
+  poetry run pytest --cov=app --cov-report=html --cov-report=term
+  open htmlcov/index.html
