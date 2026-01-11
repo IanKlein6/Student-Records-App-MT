@@ -18,9 +18,9 @@ from fastapi import HTTPException
 from tortoise.exceptions import IntegrityError
 
 from app.models.archive_log import ArchiveAction, ArchiveLog
+from app.models.model_student import Student
 from app.models.semester import Semester
 from app.schemas.schema_student import StudentCreate
-from backend.app.models.model_student import Student
 
 
 async def hard_delete_student_service(student_obj: Student, reason: str | None = None) -> None:

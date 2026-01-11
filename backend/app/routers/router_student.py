@@ -26,8 +26,8 @@ from fastapi import APIRouter, Body, HTTPException, Path, Query, Response
 from tortoise.exceptions import IntegrityError
 from tortoise.expressions import Q
 
-from backend.app.models.model_student import Student, StudentStatus
-from backend.app.schemas.schema_student import (
+from app.models.model_student import Student, StudentStatus
+from app.schemas.schema_student import (
     ArchiveRequest,
     RestoreRequest,
     StudentCreate,
@@ -35,7 +35,7 @@ from backend.app.schemas.schema_student import (
     StudentPatch,
     StudentRead,
 )
-from backend.app.services.service_student import create_student_service
+from app.services.service_student import create_student_service
 
 logger = logging.getLogger(__name__)
 

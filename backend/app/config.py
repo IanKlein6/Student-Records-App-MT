@@ -9,7 +9,7 @@ TORTOISE_ORM = {
     "apps": {
         "models": {
             "models": [
-                "app.models.student",
+                "app.models.model_student",
                 "app.models.group",
                 "app.models.semester",
                 "aerich.models",  # required

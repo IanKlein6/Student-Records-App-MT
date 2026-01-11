@@ -24,7 +24,7 @@ import httpx
 import pytest
 from tortoise import Tortoise
 
-from backend.app.api import app
+from app.api import app
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -44,7 +44,7 @@ async def db():
         db_url="sqlite://:memory:",
         modules={
             "models": [
-                "app.models.student",
+                "app.models.model_student",
                 "app.models.group",
                 "app.models.semester",
                 "app.models.archive_log",

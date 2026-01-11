@@ -21,8 +21,8 @@ import os
 from fastapi import APIRouter, Depends, HTTPException, Path, Request, Response
 from pydantic import BaseModel
 
-from backend.app.models.model_student import Student
-from backend.app.services.service_student import hard_delete_student_service
+from app.models.model_student import Student
+from app.services.service_student import hard_delete_student_service
 
 
 async def require_admin(request: Request):

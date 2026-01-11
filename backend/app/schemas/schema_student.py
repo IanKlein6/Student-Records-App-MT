@@ -28,8 +28,8 @@ from typing import Optional
 from pydantic import BaseModel
 from pydantic.config import ConfigDict
 
-from backend.app.models.model_student import StudentStatus, WorkPotential
-from backend.app.utilities.utils import NormalizedEmail, Str50, Str255
+from app.models.model_student import StudentStatus, WorkPotential
+from app.utilities.utils import NormalizedEmail, Str50, Str255
 
 
 class StudentCreate(BaseModel):
