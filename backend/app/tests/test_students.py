@@ -1,4 +1,4 @@
-# app/tests/test_students.py hi
+# app/tests/test_students.py
 
 """Unit tests for student  CRUD operations and lifecycle management.
 

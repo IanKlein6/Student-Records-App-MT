@@ -5,7 +5,7 @@ from tortoise.models import Model
 
 
 class ArchiveAction(str, Enum):
-    SOFT_ARCHIVE = "soft_archive"
+    ARCHIVE = "archive"
     RESTORE = "restore"
     HARD_DELETE = "hard_delete"
 
