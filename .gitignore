@@ -50,3 +50,4 @@ dist/
 
 # Coverage reports
 .coverage
+workspaces/
